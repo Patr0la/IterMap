@@ -108,7 +108,7 @@ export class UserData implements IUserData {
     public set username(v: string) {
         this._username = v;
         AsyncStorage.setItem(DataKeys.username, v, err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -127,7 +127,7 @@ export class UserData implements IUserData {
     public set lastLocation(v: ILastLocation) {
         this._lastLocation = v;
         AsyncStorage.setItem(DataKeys.lastLocation, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -139,7 +139,7 @@ export class UserData implements IUserData {
         this._myRoutes = v;
 
         AsyncStorage.setItem(DataKeys.myRoutes, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err &&  console.log(err); // ERR handle
         });
     }
 
@@ -151,7 +151,7 @@ export class UserData implements IUserData {
         this._myProfileInfo = v;
 
         AsyncStorage.setItem(DataKeys.myProfileInfo, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -163,7 +163,7 @@ export class UserData implements IUserData {
         this._liveRoutesInCreation = v;
 
         AsyncStorage.setItem(DataKeys.liveRoutesInCreation, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -175,7 +175,7 @@ export class UserData implements IUserData {
         this._liveRoutesTracking = v;
 
         AsyncStorage.setItem(DataKeys.liveRoutesTracking, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -187,7 +187,7 @@ export class UserData implements IUserData {
         this._grid = v;
 
         AsyncStorage.setItem(DataKeys.grid, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -199,7 +199,7 @@ export class UserData implements IUserData {
         this._cameraFront = v;
 
         AsyncStorage.setItem(DataKeys.cameraFront, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -211,7 +211,7 @@ export class UserData implements IUserData {
         this._displayAngle = v;
 
         AsyncStorage.setItem(DataKeys.displayAngle, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -223,7 +223,7 @@ export class UserData implements IUserData {
         this._flash = v;
 
         AsyncStorage.setItem(DataKeys.flash, JSON.stringify(v), err => {
-            console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 }

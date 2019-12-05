@@ -3,8 +3,8 @@ import React from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import * as config from "../Config.json";
-import { View, ImageBackground, Text, StyleSheet, Switch, Dimensions, StatusBar, Image } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { View, ImageBackground, Text, StyleSheet, Switch, Dimensions, StatusBar, Image, KeyboardAvoidingView } from "react-native";
+import { TouchableOpacity, TextInput } from "react-native-gesture-handler";
 
 import Carousel from "react-native-snap-carousel";
 
@@ -28,6 +28,8 @@ interface State {
 
     selectingPlace: boolean;
     selectedPlace?: string;
+
+    keyboardOpen: boolean;
 }
 
 export class ImageTaken extends React.Component<Props, State> {
@@ -39,6 +41,7 @@ export class ImageTaken extends React.Component<Props, State> {
             places: [],
 
             currentPage: 0,
+            keyboardOpen: false
         };
     }
 
@@ -62,7 +65,8 @@ export class ImageTaken extends React.Component<Props, State> {
                 }),
             })
                 .then(res => res.json())
-                .then((places: Array<IPlaceNerby>) => {
+                .then(places => {
+                    places.push({ id: "custom" });
                     this.setState({ places });
                 });
         }
@@ -76,7 +80,7 @@ export class ImageTaken extends React.Component<Props, State> {
                         height: "100%",
                     }}
                 >
-                    {!this.state.selectingPlace ? (
+                    {!this.state.selectingPlace && (
                         <View
                             style={{
                                 flexDirection: "column",
@@ -112,25 +116,22 @@ export class ImageTaken extends React.Component<Props, State> {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    ) : (
-                        <View style={{ width: d.width, height: d.height, flexDirection: "column", justifyContent: "flex-end" }}>
-                            {/*<View style={{height: d.height * 0.8, backgroundColor: "red"}}></View>*/}
-                            <TouchableOpacity style={{ height: "100%" }} onPress={() => this.setState({ selectingPlace: false })}></TouchableOpacity>
-                            <View style={{ marginBottom: "5%" }}>
-                                <Carousel
-                                    data={this.state.places}
-                                    renderItem={({ item: { id, name, photo, types, distance } }) => {
-                                        console.log(photo ?? "reee");
+                    )}
+
+                    <KeyboardAvoidingView style={{ width: d.width, height: d.height, flexDirection: this.state.keyboardOpen ? "column-reverse" : "column", justifyContent: "flex-end", display: this.state.selectingPlace ? "flex" : "none" }}>
+                        {/*<View style={{height: d.height * 0.8, backgroundColor: "red"}}></View>*/}
+                        <TouchableOpacity style={{ height: "100%" }} onPress={() => this.setState({ selectingPlace: false })}></TouchableOpacity>
+                        <View style={{ marginBottom: "5%" }}>
+                            <Carousel
+                                data={this.state.places}
+                                renderItem={({ item: { id, name, photo, types, distance } }) => {
+                                    if (id == "custom")
                                         return (
                                             <View key={id} style={{ width: d.width * 0.8, height: d.height * 0.3, flexDirection: "row", alignItems: "center" }}>
-                                                {photo && <Image source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?key=AIzaSyDmYhpLaw_znrqhOtnqkQ4CcWFwL6xqjCM&photoreference=${photo}&maxheight=${1600}` }} style={{ width: Math.round(d.width * 0.4), height: "100%" }} onError={err => console.log(err.nativeEvent.error)}></Image>}
                                                 <View style={{ backgroundColor: "white", width: "100%", height: d.height * 0.15, flexDirection: "column", flex: 1, marginRight: "5%", elevation: 5, justifyContent: "space-around", padding: "4%" }}>
-                                                    <Text style={{ color: "#242424", fontSize: 22, flex: 1, flexWrap: "wrap" }}>{name}</Text>
-
+                                                <TextInput onFocus={() => this.setState({keyboardOpen: true})} onGestureEvent={(e) => this.setState({keyboardOpen: false})} onEndEditing={(e) => this.setState({keyboardOpen: false})} onBlur={() => this.setState({keyboardOpen: false})} placeholder="Costum place"></TextInput>
                                                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-start" }}>
-                                                        <Icon name={TypeToIcon[types[0]]} size={32} color="#242424" />
-                                                        <Icon name="map-marker-distance" color="#242424" size={22} />
-                                                        <Text>{Math.round(distance)} m</Text>
+                                                        <Icon name="chevron-down" size={32} color="#242424" />
                                                     </View>
                                                 </View>
                                                 <View style={{ position: "absolute", right: 0, bottom: d.height * 0.05, width: d.width * 0.1, height: d.width * 0.1, backgroundColor: "#242424", elevation: 6, alignItems: "center", flexDirection: "row", justifyContent: "center", borderRadius: 5 }}>
@@ -144,16 +145,37 @@ export class ImageTaken extends React.Component<Props, State> {
                                                 </View>
                                             </View>
                                         );
-                                    }}
-                                    itemWidth={d.width * 0.8}
-                                    sliderWidth={d.width}
-                                    horizontal
-                                    onSnapToItem={x => this.setState({ currentPage: x })}
-                                    firstItem={this.state.currentPage}
-                                />
-                            </View>
+
+                                    return (
+                                        <View key={id} style={{ width: d.width * 0.8, height: d.height * 0.3, flexDirection: "row", alignItems: "center" }}>
+                                            {photo && <Image source={{ uri: `https://maps.googleapis.com/maps/api/place/photo?key=AIzaSyDmYhpLaw_znrqhOtnqkQ4CcWFwL6xqjCM&photoreference=${photo}&maxheight=${1600}` }} style={{ width: Math.round(d.width * 0.4), height: "100%" }} onError={err => console.log(err.nativeEvent.error)}></Image>}
+                                            <View style={{ backgroundColor: "white", width: "100%", height: d.height * 0.15, flexDirection: "column", flex: 1, marginRight: "5%", elevation: 5, justifyContent: "space-around", padding: "4%" }}>
+                                                <Text style={{ color: "#242424", fontSize: 22, flex: 1, flexWrap: "wrap" }}>{name}</Text>
+
+                                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-start" }}>
+                                                    <Icon name={TypeToIcon[types[0]]} size={32} color="#242424" />
+                                                    <Icon name="map-marker-distance" color="#242424" size={22} />
+                                                    <Text>{Math.round(distance)} m</Text>
+                                                </View>
+                                            </View>
+                                            <View style={{ position: "absolute", right: 0, bottom: d.height * 0.05, width: d.width * 0.1, height: d.width * 0.1, backgroundColor: "#242424", elevation: 6, alignItems: "center", flexDirection: "row", justifyContent: "center", borderRadius: 5 }}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        this.setState({ selectedPlace: id, selectingPlace: false });
+                                                    }}
+                                                >
+                                                    <Icon name="map-marker-check" color="white" size={42} />
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    );
+                                }}
+                                itemWidth={d.width * 0.8}
+                                sliderWidth={d.width}
+                                horizontal
+                            />
                         </View>
-                    )}
+                    </KeyboardAvoidingView>
                 </ImageBackground>
             );
         return <View></View>;

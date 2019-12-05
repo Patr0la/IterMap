@@ -39,7 +39,7 @@ export class Home extends React.Component<Props, State> {
 
         this.state = {
             viewing: "world",
-            scrollEnabled: true
+            scrollEnabled: true,
         };
     }
 
@@ -85,32 +85,42 @@ export class Home extends React.Component<Props, State> {
     _panResponder: PanResponderInstance;
     viewPager: ViewPager;
     render() {
-        if (this.props.data.liveRoutesTracking.reduce((pv, { tracking }) => tracking || pv, false)) return;
-        this.home();
+        if (!this.props.data.liveRoutesTracking.reduce((pv, { tracking }) => tracking || pv, false)) return this.home();
 
         StatusBar.setTranslucent(true);
         StatusBar.setBackgroundColor("#24242411");
 
         return (
-            <ViewPager  style={{ flex: 1}} 
-            scrollEnabled={this.state.scrollEnabled}
-            ref={ref => {this.viewPager = ref;}}
-            onPageSelected={({nativeEvent: {position}}) => {
-                position == 0 ? this.props.navigation.setParams({drawerLockMode: "unlocked"}) : this.props.navigation.setParams({drawerLockMode: "locked-closed"})
+            <ViewPager
+                style={{ flex: 1 }}
+                scrollEnabled={this.state.scrollEnabled}
+                ref={ref => {
+                    this.viewPager = ref;
+                }}
+                onPageSelected={({ nativeEvent: { position } }) => {
+                    position == 0 ? this.props.navigation.setParams({ drawerLockMode: "unlocked" }) : this.props.navigation.setParams({ drawerLockMode: "locked-closed" });
 
-                this.setState({scrollEnabled: position != 2});
-                
-            }}
-            initialPage={1}
+                    this.setState({ scrollEnabled: position != 2 });
+                }}
+                initialPage={1}
             >
-                <View key={0} style={{ backgroundColor: "#242424", height: d.height, width: d.width, paddingTop: StatusBar.currentHeight }}>{this.home()}</View>
-                
-                <View key={1} style={{ backgroundColor: "#242424", height: d.height, width: d.width }}><Camera data={this.props.data} navigation={this.props.navigation}></Camera></View>
-                
+                <View key={0} style={{ backgroundColor: "#242424", height: d.height, width: d.width, paddingTop: StatusBar.currentHeight }}>
+                    {this.home()}
+                </View>
 
-                <View key={2} style={{ backgroundColor: "#242424", height: d.height, width: d.width, paddingTop: StatusBar.currentHeight }}><LiveRoute pageMove={() => {
-                    this.viewPager.setPage(1);
-                }}id={this.props.data.liveRoutesTracking[0].id} data={this.props.data} ></LiveRoute></View>
+                <View key={1} style={{ backgroundColor: "#242424", height: d.height, width: d.width }}>
+                    <Camera data={this.props.data} navigation={this.props.navigation}></Camera>
+                </View>
+
+                <View key={2} style={{ backgroundColor: "#242424", height: d.height, width: d.width, paddingTop: StatusBar.currentHeight }}>
+                    <LiveRoute
+                        pageMove={() => {
+                            this.viewPager.setPage(1);
+                        }}
+                        id={this.props.data.liveRoutesTracking[0].id}
+                        data={this.props.data}
+                    ></LiveRoute>
+                </View>
             </ViewPager>
         );
     }
