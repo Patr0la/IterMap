@@ -88,7 +88,7 @@ export class Search extends React.Component<Props, State> {
                         <TextInput
                             style={{ width: "80%", color: "white", backgroundColor: "#323232" }}
                             value={this.state.text}
-                            placeholder="Search for places"
+                            placeholder={this.props.placeHolder}
                             placeholderTextColor="#aaaaaa"
                             onChangeText={text => {
                                 this.querry(text);
@@ -149,7 +149,7 @@ export enum TypeToIcon {
     campground = "tent",
     casino = "cards-club",
     cemetery = "coffin",
-    church = "curch",
+    church = "church",
     clothing_store = "tshirt-crew",
     convenience_store = "store",
     florist = "flower-outline",
@@ -163,8 +163,6 @@ export enum TypeToIcon {
     home_goods_store = "store",
     hospital = "hospital-box",
     library = "library-shelves",
-    meal_delivery = "email",
-    meal_takeaway = "email",
     movie_theater = "theater",
     museum = "bank",
     night_club = "glass-cocktail",

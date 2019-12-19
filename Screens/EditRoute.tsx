@@ -9,7 +9,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import * as config from "../Config.json";
 import { Search } from "../Components/Search";
 
-interface Props extends IProps {}
+interface Props extends IProps { }
 
 interface State extends IRoute {
     loaded: boolean;
@@ -89,6 +89,8 @@ export class EditRoute extends React.Component<Props, State> {
                 description: "",
                 price: { currency: "€", value: 0 },
                 time: "",
+                id: `marker_${(new Date()).getTime()}`,
+                types: []
             },
         ]);
     }
@@ -126,7 +128,7 @@ export class EditRoute extends React.Component<Props, State> {
         });
     }
 
-    searchForPlace(querry: string) {}
+    searchForPlace(querry: string) { }
 
     render() {
         let id = this.props.navigation.getParam("id");
@@ -165,34 +167,34 @@ export class EditRoute extends React.Component<Props, State> {
                         <TextInput style={styles.textInput} value={this.state.title} onChangeText={title => this.setState({ title })}></TextInput>
                     </View>
                 ) : (
-                    <View style={{ width: "100%", height: "100%" }}>
-                        <Search
-                            endpoint="findLocation"
-                            navigation={this.props.navigation}
-                            data={this.props.data}
-                            requestPrepeareCallback={async () => {
-                                let { center } = await this.editMap.MapView.getCamera();
-                                return { lat: center.latitude, lng: center.longitude };
-                            }}
-                            onSelectCallback={selection => {
-                                console.log(selection);
-                            }}
-                            placeHolder="Search for places.."
-                        />
-                        <EditMap ref={ref => (this.editMap = ref)} addMarker={pos => this.addMarker(pos)} data={this.props.data}></EditMap>
-                        <MarkerList
-                            ref={ref => (this.markerList = ref)}
-                            routeId={this.state._id}
-                            onMarkerUpdate={markers => {
-                                this.onMarkerUpdate(markers);
-                            }}
-                            markers={this.state.markers}
-                            Map={this.editMap}
-                            data={this.props.data}
-                            navigation={this.props.navigation}
-                        ></MarkerList>
-                    </View>
-                )}
+                        <View style={{ width: "100%", height: "100%" }}>
+                            <Search
+                                endpoint="findLocation"
+                                navigation={this.props.navigation}
+                                data={this.props.data}
+                                requestPrepeareCallback={async () => {
+                                    let { center } = await this.editMap.MapView.getCamera();
+                                    return { lat: center.latitude, lng: center.longitude };
+                                }}
+                                onSelectCallback={selection => {
+                                    console.log(selection);
+                                }}
+                                placeHolder="Search for places.."
+                            />
+                            <EditMap ref={ref => (this.editMap = ref)} addMarker={pos => this.addMarker(pos)} data={this.props.data}></EditMap>
+                            <MarkerList
+                                ref={ref => (this.markerList = ref)}
+                                routeId={this.state._id}
+                                onMarkerUpdate={markers => {
+                                    this.onMarkerUpdate(markers);
+                                }}
+                                markers={this.state.markers}
+                                Map={this.editMap}
+                                data={this.props.data}
+                                navigation={this.props.navigation}
+                            ></MarkerList>
+                        </View>
+                    )}
             </View>
         );
     }

@@ -4,29 +4,25 @@ import { DataKeys } from "../UserData";
 
 import * as config from "../Config.json";
 
-interface State {}
+interface State { }
 
 export class LoadingScreen extends React.Component<IProps, State> {
     constructor(props: IProps) {
         super(props);
 
         let canNavigateToHome = false;
+        let goneHome = false;
         props.data.initilize(
             () => {
                 if (props.data.token) {
-                    if (canNavigateToHome) {
-                        if (props.data.liveRoutesTracking) props.navigation.navigate("Home");
-                        else props.navigation.navigate("Home");
-                    } else canNavigateToHome = true;
+                    props.navigation.navigate("Home");
+                    goneHome = true;
                 } else {
                     props.navigation.navigate("Login");
                 }
             },
             () => {
-                if (canNavigateToHome) {
-                    if (props.data.liveRoutesTracking) props.navigation.navigate("Home");
-                    else props.navigation.navigate("Home");
-                } else canNavigateToHome = true;
+                console.log("Loaction setup")
             }
         );
     }

@@ -8,19 +8,22 @@ import { Search } from "../Components/Search";
 import { RoutesPreview } from "../Components/RoutesPreview";
 
 import BackgroundGeolocation, { Location } from "@mauron85/react-native-background-geolocation";
+
 import AsyncStorage from "@react-native-community/async-storage";
-import { DataKeys } from "../UserData";
+import { DataKeys, UserData } from "../UserData";
 import { ScrollView } from "react-native-gesture-handler";
 import { Camera } from "./Camera";
 import { LiveRoute } from "./LiveRoute";
 
 import ViewPager from "@react-native-community/viewpager";
 
-interface Props extends IProps {}
+interface Props extends IProps { }
 
 interface State {
     viewing: "nearby" | "country" | "world";
     scrollEnabled: boolean;
+
+    currentStepCount?: number;
 }
 
 export class Home extends React.Component<Props, State> {
@@ -41,6 +44,7 @@ export class Home extends React.Component<Props, State> {
             viewing: "world",
             scrollEnabled: true,
         };
+4
     }
 
     Searchbar: Search;
@@ -49,7 +53,7 @@ export class Home extends React.Component<Props, State> {
         return (
             <View>
                 <Search
-                    placeHolder="Search for routes"
+                    placeHolder={this.state.currentStepCount?.toString()} //"Search for routes"
                     ref={ref => (this.Searchbar = ref)}
                     endpoint="findRoutes"
                     menu
@@ -72,12 +76,12 @@ export class Home extends React.Component<Props, State> {
                         </TouchableOpacity>
                     </View>
                 ) : (
-                    <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                        <TouchableOpacity style={{ ...styles.button, ...(this.state.viewing == "world" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }} onPress={() => this.setState({ viewing: "world" })}>
-                            <Text style={{ ...styles.buttonText, width: d.width }}>World</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
+                        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                            <TouchableOpacity style={{ ...styles.button, ...(this.state.viewing == "world" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }} onPress={() => this.setState({ viewing: "world" })}>
+                                <Text style={{ ...styles.buttonText, width: d.width }}>World</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
             </View>
         );
     }
@@ -85,7 +89,7 @@ export class Home extends React.Component<Props, State> {
     _panResponder: PanResponderInstance;
     viewPager: ViewPager;
     render() {
-        if (!this.props.data.liveRoutesTracking.reduce((pv, { tracking }) => tracking || pv, false)) return this.home();
+        if (!this.props.data.liveRoutesTracking?.reduce((pv, { tracking }) => tracking || pv, false)) return this.home();
 
         StatusBar.setTranslucent(true);
         StatusBar.setBackgroundColor("#24242411");
@@ -148,12 +152,13 @@ export class Home extends React.Component<Props, State> {
             console.log("GEOLOCATION RUNNING");
         });
 
+
         BackgroundGeolocation.on("error", err => {
             console.log("ERR: " + err.message);
         });
 
         BackgroundGeolocation.on("location", location => {
-            procesPoint(location);
+            procesPoint(location, this.props.data);
             //{accuracy, latitude, longitude, altitude, time}
         });
 
@@ -184,7 +189,7 @@ export class Home extends React.Component<Props, State> {
             if (!status.isRunning) {
                 BackgroundGeolocation.start();
                 BackgroundGeolocation.headlessTask(async event => {
-                    if (event.name == "location" || event.name == "stationary") procesPoint(event.params);
+                    if (event.name == "location" || event.name == "stationary") procesPoint(event.params, this.props.data);
                 });
             } else if (this.props.data?.liveRoutesTracking?.length) {
                 BackgroundGeolocation.start();
@@ -204,15 +209,22 @@ export class Home extends React.Component<Props, State> {
 }
 
 var lastPoints = [];
-function procesPoint(point: Location) {
-    return false;
+function procesPoint(point: Location, data: IUserData) {
+    let { accuracy, longitude, latitude, altitude, time } = point;
+    data.lastPos = { accuracy, longitude, latitude, altitude, time }
+
+
+    // console.log(data.lastPos)
+
+    // return false;
+    
     if (lastPoints.length > 20) {
         lastPoints.shift();
         lastPoints.push();
     } else lastPoints.push();
 
-    let latitude = parseFloat(point.latitude.toFixed(5));
-    let longitude = parseFloat(point.longitude.toFixed(5));
+    // let latitude = parseFloat(point.latitude.toFixed(5));
+    // let longitude = parseFloat(point.longitude.toFixed(5));
 
     AsyncStorage.getItem(DataKeys.liveRoutesTracking, (err, res) => {
         if (err) return console.log(err);

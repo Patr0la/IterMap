@@ -8,6 +8,7 @@ interface IUserData {
     username: string;
     token: string;
     lastLocation: ILastLocation;
+    lastPos: ILivePos;
 
     myRoutes: Array<IRoute>;
     myProfileInfo: IProfileEntry;
@@ -77,12 +78,16 @@ interface IInternationalRoute extends IRoute {
 type travelVehicle = "Plane" | "Ship" | "Bus" | "Car" | "Foot";
 
 interface IMarker {
+    id: string;
+
     pos: IPos;
     title?: string;
     pictures?: Array<string>;
     time: string;
     price: ICost;
     description: string;
+
+    types: Array<string>;
 
     _markerOnMap?: any;
 }
@@ -114,6 +119,8 @@ interface ILiveRoute {
     latencyUnit?: "h" | "m";
 
     path?: Array<ILivePos>;
+
+    markers?: Array<IMarker>;
 }
 
 interface ILivePos extends IPos {

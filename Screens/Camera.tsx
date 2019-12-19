@@ -92,9 +92,6 @@ export class Camera extends React.Component<Props, IState> {
 
     rotation;
     componentWillUnmount() {
-        StatusBar.setTranslucent(false);
-        StatusBar.setBackgroundColor("#242424");
-
         this.accelerometer.unsubscribe();
         this.accelerometer.remove();
     }
@@ -127,9 +124,6 @@ export class Camera extends React.Component<Props, IState> {
         });
 
         if (this.props.navigation.isFocused) {
-            StatusBar.setTranslucent(true);
-            StatusBar.setBackgroundColor("#24242411");
-
             return (
                 <Animated.View>
                     <RNCamera
@@ -249,9 +243,6 @@ export class Camera extends React.Component<Props, IState> {
             );
         }
 
-        this.camera.componentWillUnmount();
-        StatusBar.setTranslucent(false);
-        StatusBar.setBackgroundColor("#242424");
         return <View></View>;
     }
 

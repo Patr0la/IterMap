@@ -78,6 +78,9 @@ import com.android.build.OutputFile
 project.ext.react = [
     entryFile: "index.js",
     enableHermes: false,  // clean and rebuild if changing
+
+    bundleAssetName: "index.bundle",
+    bundleInDebug: true,
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -151,12 +154,12 @@ android {
             keyPassword 'android'
         }
         release {
-            if(project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-                storeFile file("IterKey.keystore")
+            //if(project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file("my-upload-key.keystore")
                 storePassword "45b7a106"
-                keyAlias "Iter"
+                keyAlias "my-key-alias"
                 keyPassword "45b7a106"
-            }
+            //}
         }
     }
     buildTypes {

@@ -97,6 +97,7 @@ export class LiveRouteManage extends React.Component<Props, State> {
 
                                         name: this.state.newRouteName,
                                         path: [],
+                                        markers: [],
 
                                         share: false,
                                         latency: 0,

@@ -131,6 +131,15 @@ export class UserData implements IUserData {
         });
     }
 
+    private _lastPos : ILivePos;
+    public get lastPos() : ILivePos {
+        return this._lastPos;
+    }
+    public set lastPos(v : ILivePos) {
+        this._lastPos = v;
+    }
+    
+
     private _myRoutes: Array<IRoute>;
     public get myRoutes(): Array<IRoute> {
         return this._myRoutes;
