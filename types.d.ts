@@ -14,13 +14,18 @@ interface IUserData {
     myProfileInfo: IProfileEntry;
     liveRoutesInCreation: Array<{ id: string; name: string, tracking: boolean }>;
     liveRoutesTracking: Array<{ id: string; name: string, tracking: boolean }>;
-    
+
     initilize(callback: () => void, locationCallback: () => void): void;
 
     displayAngle: boolean;
     flash: boolean;
     cameraFront: boolean;
     grid: boolean;
+
+    displayHeatMap: boolean;
+    displayMarkers: boolean;
+    displayPath: boolean;
+    displaySatelite: boolean;
 }
 interface ILastLocation {
     city: string;
@@ -89,6 +94,8 @@ interface IMarker {
 
     types: Array<string>;
 
+    day: number;
+
     _markerOnMap?: any;
 }
 
@@ -129,6 +136,7 @@ interface ILivePos extends IPos {
     longitude: number;
     altitude: number;
     accuracy: number;
+    speed: number;
 }
 
-interface ObjectId {}
+interface ObjectId { }

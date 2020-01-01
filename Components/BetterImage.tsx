@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, Picker, PickerItem, ViewPropTypes, ActivityIndicator, NativeSyntheticEvent, ImageErrorEventData} from 'react-native';
+import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, Picker, PickerItem, ViewPropTypes, ActivityIndicator, NativeSyntheticEvent, ImageErrorEventData } from 'react-native';
 import * as fs from 'rn-fetch-blob';
 
 const sha = require('../sha');
@@ -35,21 +35,21 @@ export class BetterImage extends React.Component<Props, State> {
                 {this.state.failed && this.props.children ? (
                     this.props.children
                 ) : (
-                    <View>
                         <Image
+                            resizeMode="stretch"
                             style={this.props.imageStyle}
                             source={{
                                 uri: this.props.url,
                                 headers: {
-                                    Cookie: this.props.data.token,
+                                    Cookie: this.props.data?.token,
                                 },
                             }}
-                            onLoadEnd={() => this.setState({loading: false})}
-                            onError={err => this.setState({failed: true})}
+                            onLoadEnd={() => this.setState({ loading: false })}
+                            onError={err => this.setState({ failed: true })}
                         />
-                        <ActivityIndicator animating={this.state.loading}></ActivityIndicator>
-                    </View>
-                )}
+
+                    )}
+                {this.state.loading && !this.state.failed && <ActivityIndicator animating={this.state.loading}></ActivityIndicator>}
             </View>
         );
     }

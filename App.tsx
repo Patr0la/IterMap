@@ -40,268 +40,286 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 var userData = new UserData();
 
 //#region Auth Stack Navigator
-const LoginScreen = props => {
-    return <Login navigate={props.navigation.navigate}></Login>;
+const LoginScreen = (props) => {
+	return <Login navigation={props.navigation} data={userData}></Login>;
 };
 
-const RegisterScreen = props => {
-    return <Register navigate={props.navigation.navigate}></Register>;
+const RegisterScreen = (props) => {
+	return <Register navigation={props.navigation} data={userData}></Register>;
 };
 
 const AuthStack = createStackNavigator({
-    Login: {
-        screen: LoginScreen,
-        navigationOptions: ({ navigation }) => ({
-            title: "Login",
-        }),
-    },
-    Register: RegisterScreen,
+	Login: {
+		screen: LoginScreen,
+		navigationOptions: ({ navigation }) => ({
+			header: null,
+		}),
+	},
+	Register: {
+		screen: RegisterScreen,
+		navigationOptions: ({ navigation }) => ({
+			header: null,
+		}),
+	},
 });
 
 //#endregion
 
 //#region App Drawer Navigator
-const HomeScreen = props => {
-    return <Home data={userData} navigation={props.navigation}></Home>;
+const HomeScreen = (props) => {
+	return <Home data={userData} navigation={props.navigation}></Home>;
 };
 
-const ProfileScreen = props => {
-    return <Profile data={userData} navigation={props.navigation}></Profile>;
+const ProfileScreen = (props) => {
+	return <Profile data={userData} navigation={props.navigation}></Profile>;
 };
 
-const LoadingScreenScreen = props => {
-    return <LoadingScreen data={userData} navigation={props.navigation}></LoadingScreen>;
+const LoadingScreenScreen = (props) => {
+	return <LoadingScreen data={userData} navigation={props.navigation}></LoadingScreen>;
 };
 
-const LogoutScreen = props => {
-    return <Logout navigate={props.navigation.navigate}></Logout>;
+const LogoutScreen = (props) => {
+	return <Logout navigate={props.navigation.navigate}></Logout>;
 };
 
-const SettingsScreen = props => {
-    return <Settings navigate={props.navigation.navigate}></Settings>;
+const SettingsScreen = (props) => {
+	return <Settings navigate={props.navigation.navigate}></Settings>;
 };
 
-const CameraScreen = props => {
-    return <Camera data={userData} navigation={props.navigation}></Camera>;
+const CameraScreen = (props) => {
+	return <Camera data={userData} navigation={props.navigation}></Camera>;
 };
 
-const ImageTakenScreen = props => {
-    return <ImageTaken data={userData} navigation={props.navigation}></ImageTaken>;
+const ImageTakenScreen = (props) => {
+	return <ImageTaken data={userData} navigation={props.navigation}></ImageTaken>;
 };
 
 const CameraStack = createStackNavigator({
-    Camera: {
-        screen: CameraScreen,
-        navigationOptions: () => ({
-            header: null,
-        }),
-    },
-    ImageTaken: {
-        screen: ImageTakenScreen,
-        navigationOptions: () => ({
-            header: null,
-        }),
-    },
+	Camera: {
+		screen: CameraScreen,
+		navigationOptions: () => ({
+			header: null,
+		}),
+	},
+	ImageTaken: {
+		screen: ImageTakenScreen,
+		navigationOptions: () => ({
+			header: null,
+		}),
+	},
 });
 
 //#region RuteCreation Stack Navigator
 
 var openRouteEditor: (id: string) => void;
 
-const EditRouteScreen = props => {
-    return <EditRoute ref={ref => (openRouteEditor = ref ? ref.LoadRoute : undefined)} data={userData} navigation={props.navigation}></EditRoute>;
+const EditRouteScreen = (props) => {
+	return <EditRoute ref={(ref) => (openRouteEditor = ref ? ref.LoadRoute : undefined)} data={userData} navigation={props.navigation}></EditRoute>;
 };
 
-const CreateNewRouteScreen = props => {
-    return <CreateNewRoute data={userData} navigation={props.navigation}></CreateNewRoute>;
+const CreateNewRouteScreen = (props) => {
+	return <CreateNewRoute data={userData} navigation={props.navigation}></CreateNewRoute>;
 };
 
-const MarkerEditScreen = props => {
-    return <EditMarker data={userData} navigation={props.navigation}></EditMarker>;
+const MarkerEditScreen = (props) => {
+	return <EditMarker data={userData} navigation={props.navigation}></EditMarker>;
 };
 
 const RouteCreationStack = createStackNavigator({
-    CreateNewRoute: {
-        screen: CreateNewRouteScreen,
-    },
-    EditRoute: {
-        screen: EditRouteScreen,
-        navigationOptions: () => ({
-            header: null,
-        }),
-    },
+	CreateNewRoute: {
+		screen: CreateNewRouteScreen,
+	},
+	EditRoute: {
+		screen: EditRouteScreen,
+		navigationOptions: () => ({
+			header: null,
+		}),
+	},
 });
 
 const ProfileStack = createStackNavigator({
-    Profile: {
-        screen: ProfileScreen,
-        navigationOptions: () => ({
-            header: null,
-        }),
-    },
-    EditRoute: {
-        screen: EditRouteScreen,
-        navigationOptions: () => ({
-            header: null,
-            drawerLockMode: "locked-closed",
-        }),
-    },
-    MarkerEditScreen: {
-        screen: MarkerEditScreen,
-        navigationOptions: () => ({
-            title: "Edit marker",
-            drawerLockMode: "locked-closed",
-        }),
-    },
+	Profile: {
+		screen: ProfileScreen,
+		navigationOptions: () => ({
+			header: null,
+		}),
+	},
+	EditRoute: {
+		screen: EditRouteScreen,
+		navigationOptions: () => ({
+			header: null,
+			drawerLockMode: "locked-closed",
+		}),
+	},
+	MarkerEditScreen: {
+		screen: MarkerEditScreen,
+		navigationOptions: ({ navigation }) => ({
+			title: "Edit marker",
+			drawerLockMode: "locked-closed",
+			headerRight: () => {
+				return (
+					<Icon
+						
+						onPress={() => {
+							console.log(this);
+							console.log(navigation.getParam("data", {}));
+							navigation.getParam("callback", () => {})(navigation.getParam("data", {}));
+							navigation.goBack();
+						}}
+						name="check"
+						size={30}
+					/>
+				);
+            },
+            headerRightContainerStyle: {marginRight: "5%"}
+		}),
+	},
 });
 //#endregion
 
 //#region LiveRouteStack
 
-const CreateLiveRouteScreen = props => {
-    return <LiveRouteManage data={userData} navigation={props.navigation}></LiveRouteManage>;
+const CreateLiveRouteScreen = (props) => {
+	return <LiveRouteManage data={userData} navigation={props.navigation}></LiveRouteManage>;
 };
 
-const LiveRouteScreen = props => {
-    return <LiveRoute navigatedTo data={userData} navigation={props.navigation}></LiveRoute>;
+const LiveRouteScreen = (props) => {
+	return <LiveRoute navigatedTo data={userData} navigation={props.navigation}></LiveRoute>;
 };
 const LiveRouteStack = createStackNavigator({
-    CreateLiveRoute: {
-        screen: CreateLiveRouteScreen,
-        navigationOptions: ({navigation}) => ({
-            headerTitle: props => (
-                <View style={{ backgroundColor: "#242424", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", height: "100%", paddingLeft: "5%" }}>
-                    <TouchableOpacity onPress={
-                        () => navigation.goBack(null)
-                    }>
-                        <Icon name="arrow-left" size={26} color="white" />
-                    </TouchableOpacity>
-                    <Text style={{ color: "white", fontSize: 24, marginLeft: "5%" }}>Manage live routes</Text>
-                </View>
-            ),
-            drawerLockMode: "locked-closed",
-        }),
-    },
-    LiveRoute: {
-        screen: LiveRouteScreen,
-        navigationOptions: ({navigation}) => ({
-            headerTitle: props => (
-                <View style={{ backgroundColor: "#242424", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", height: "100%", paddingLeft: "5%" }}>
-                    <Text style={{ color: "white", fontSize: 24, marginLeft: "5%" }}>{navigation.getParam("routeName", "?")} </Text>
-                </View>
-            ),
-            drawerLockMode: "locked-closed",
-            headerLeftContainerStyle: {backgroundColor: "#242424", color: "white"},
-            headerTintColor: "white",
-            headerTitleStyle: {color: "white"},
-            headerBackTitleStyle: {color: "white"}
-        }),
-    },
+	CreateLiveRoute: {
+		screen: CreateLiveRouteScreen,
+		navigationOptions: ({ navigation }) => ({
+			headerTitle: (props) => (
+				<View style={{ backgroundColor: "#242424", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", height: "100%", paddingLeft: "5%" }}>
+					<TouchableOpacity onPress={() => navigation.goBack(null)}>
+						<Icon name="arrow-left" size={26} color="white" />
+					</TouchableOpacity>
+					<Text style={{ color: "white", fontSize: 24, marginLeft: "5%" }}>Manage live routes</Text>
+				</View>
+			),
+			drawerLockMode: "locked-closed",
+		}),
+	},
+	LiveRoute: {
+		screen: LiveRouteScreen,
+		navigationOptions: ({ navigation }) => ({
+			headerTitle: (props) => (
+				<View style={{ backgroundColor: "#242424", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", width: "100%", height: "100%", paddingLeft: "5%" }}>
+					<Text style={{ color: "white", fontSize: 24, marginLeft: "5%" }}>{navigation.getParam("routeName", "?")} </Text>
+				</View>
+			),
+			drawerLockMode: "locked-closed",
+			headerLeftContainerStyle: { backgroundColor: "#242424", color: "white" },
+			headerTintColor: "white",
+			headerTitleStyle: { color: "white" },
+			headerBackTitleStyle: { color: "white" },
+		}),
+	},
 });
 
 //#endregion
 
-const SideMenuComponent = props => {
-    return <SideMenu data={userData} navigation={props.navigation}></SideMenu>;
+const SideMenuComponent = (props) => {
+	return <SideMenu data={userData} navigation={props.navigation}></SideMenu>;
 };
 
 const Drawer = createDrawerNavigator(
-    {
-        Home: {
-            screen: HomeScreen,
-            path: "people/:name",
-            navigationOptions: options => ({
-                title: `Home`,
-                drawerLockMode: options.navigation.state.params?.drawerLockMode ?? "unlocked",
-                //navigate: options.navigation
-            }),
-        },
-        Profile: {
-            screen: ProfileStack,
-            path: "people/:name",
-            navigationOptions: ({ navigation }) => ({
-                title: `Profile`,
-                //naviagte: navigation.navigate,
-            }),
-        },
-        Settings: {
-            screen: SettingsScreen,
-            navigationOptions: () => ({
-                title: "Settings",
-                drawerLabel: null,
-            }),
-        },
-        Logout: {
-            screen: LogoutScreen,
-            navigationOptions: () => ({
-                title: "Logout",
-                drawerLabel: null,
-            }),
-        },
-        RouteCreation: {
-            screen: RouteCreationStack,
-            navigationOptions: () => ({
-                title: "New Route",
-                drawerLockMode: "locked-closed",
-            }),
-        },
-        LiveRouteCreation: {
-            screen: LiveRouteStack,
-            navigationOptions: () => ({
-                title: "LiveRoutes",
-                drawerLockMode: "locked-closed",
-            }),
-        },
-        Camera: {
-            screen: CameraStack,
-            
-        },
+	{
+		Home: {
+			screen: HomeScreen,
+			path: "people/:name",
+			navigationOptions: (options) => ({
+				title: `Home`,
+				drawerLockMode: options.navigation.state.params?.drawerLockMode ?? "unlocked",
+				//navigate: options.navigation
+			}),
+		},
+		Profile: {
+			screen: ProfileStack,
+			path: "people/:name",
+			navigationOptions: ({ navigation }) => ({
+				title: `Profile`,
+				//naviagte: navigation.navigate,
+			}),
+		},
+		Settings: {
+			screen: SettingsScreen,
+			navigationOptions: () => ({
+				title: "Settings",
+				drawerLabel: null,
+			}),
+		},
+		Logout: {
+			screen: LogoutScreen,
+			navigationOptions: () => ({
+				title: "Logout",
+				drawerLabel: null,
+			}),
+		},
+		RouteCreation: {
+			screen: RouteCreationStack,
+			navigationOptions: () => ({
+				title: "New Route",
+				drawerLockMode: "locked-closed",
+			}),
+		},
+		LiveRouteCreation: {
+			screen: LiveRouteStack,
+			navigationOptions: () => ({
+				title: "LiveRoutes",
+				drawerLockMode: "locked-closed",
+			}),
+		},
+		Camera: {
+			screen: CameraStack,
+		},
 
-        // TODO: Create more pages
-    },
-    {
-        initialRouteName: "Home",
-        unmountInactiveRoutes: true,
-        defaultNavigationOptions: {
-            title: "IterrMap",
-        },
-        contentComponent: SideMenuComponent,
-        // transitionConfig: () => ({
-        //     transitionSpec: {
-        //         duration: 300,
-        //         easing: Easing.out(Easing.poly(4)),
-        //         timing: Animated.timing,
-        //     },
-        //     screenInterpolator: sceneProps => {
-        //         const { layout, position, scene } = sceneProps;
-        //         const { index } = scene;
+		// TODO: Create more pages
+	},
+	{
+		initialRouteName: "Home",
+		unmountInactiveRoutes: true,
+		defaultNavigationOptions: {
+			title: "IterrMap",
+		},
+		contentComponent: SideMenuComponent,
+		// transitionConfig: () => ({
+		//     transitionSpec: {
+		//         duration: 300,
+		//         easing: Easing.out(Easing.poly(4)),
+		//         timing: Animated.timing,
+		//     },
+		//     screenInterpolator: sceneProps => {
+		//         const { layout, position, scene } = sceneProps;
+		//         const { index } = scene;
 
-        //         const width = layout.initWidth;
+		//         const width = layout.initWidth;
 
-        //         const translateX = position.interpolate({
-        //             inputRange: [index - 1, index, index + 1],
-        //             outputRange: [0, 0, width],
-        //         });
+		//         const translateX = position.interpolate({
+		//             inputRange: [index - 1, index, index + 1],
+		//             outputRange: [0, 0, width],
+		//         });
 
-        //         const opacity = position.interpolate({
-        //             inputRange: [index - 1, index - 0.99, index],
-        //             outputRange: [0, 1, 1],
-        //         });
+		//         const opacity = position.interpolate({
+		//             inputRange: [index - 1, index - 0.99, index],
+		//             outputRange: [0, 1, 1],
+		//         });
 
-        //         return { opacity, transform: [{ translateX }] };
-        //     },
-        // }),
-    }
+		//         return { opacity, transform: [{ translateX }] };
+		//     },
+		// }),
+	},
 );
 
-Drawer
+Drawer;
 //#endregion
 
 //#region Switch Navigator
 const Switch = createSwitchNavigator({
-    Loading: LoadingScreenScreen,
-    App: Drawer,
-    Auth: AuthStack,
+	Loading: LoadingScreenScreen,
+	App: Drawer,
+	Auth: AuthStack,
 });
 
 const App = createAppContainer(Switch);

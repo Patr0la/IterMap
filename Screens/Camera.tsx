@@ -8,7 +8,7 @@ import { RNCamera, Point } from "react-native-camera";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import * as config from "../Config.json";
-import { Search } from "../Components/Search";
+import { SearchBox } from "../Components/SearchBox";
 
 import { accelerometer, SensorTypes, setUpdateIntervalForType } from "react-native-sensors";
 
@@ -260,7 +260,7 @@ export class Camera extends React.Component<Props, IState> {
         let x = await this.camera.takePictureAsync({ quality: 0.7, base64: true, pauseAfterCapture: true, doNotSave: true });
 
         this.camera.resumePreview();
-        this.props.navigation.navigate("ImageTaken", { imageData: x.base64, location: {lat: this.props.data.lastLocation.pos.latitude, lng: this.props.data.lastLocation.pos.longitude} });
+        this.props.navigation.navigate("ImageTaken", { imageData: x.base64, location: {lat: this.props.data.lastPos.latitude, lng: this.props.data.lastPos.longitude} });
     }
 }
 

@@ -3,12 +3,12 @@ import React from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import * as config from "../Config.json";
-import { View, ImageBackground, Text, StyleSheet, Switch, Dimensions, StatusBar, Image, KeyboardAvoidingView, Keyboard } from "react-native";
+import { View, ImageBackground, Text, StyleSheet, Dimensions, StatusBar, Image, KeyboardAvoidingView, Keyboard } from "react-native";
 import { TouchableOpacity, TextInput, ScrollView } from "react-native-gesture-handler";
 
 import Carousel from "react-native-snap-carousel";
 
-import { TypeToIcon } from "../Components/Search";
+import { TypeToIcon } from "../Components/SearchBox";
 import RNFetchBlob from "rn-fetch-blob";
 
 import { SearchablePicker } from "../Components/SearchablePicker";
@@ -70,7 +70,7 @@ export class ImageTaken extends React.Component<Props, State> {
         const location = this.props.navigation.getParam("location", "none");
         if (imageData != this.state.imageData) {
             // TODO rest of props
-            this.setState({ imageData, location, timeTaken: (new Date()).getTime(), posTaken: { latitude: this.props.data.lastPos.latitude, longitude: this.props.data.lastPos.longitude, time: this.props.data.lastPos.time, accuracy: this.props.data.lastPos.accuracy, altitude: this.props.data.lastPos.altitude } });
+            this.setState({ imageData, location, timeTaken: (new Date()).getTime(), posTaken: { latitude: this.props.data.lastPos.latitude, longitude: this.props.data.lastPos.longitude, time: this.props.data.lastPos.time, accuracy: this.props.data.lastPos.accuracy, altitude: this.props.data.lastPos.altitude, speed: this.props.data.lastPos.speed } });
             console.log("REEEEE1111");
             fetch(`http://${config.host}/findPlacesNear`, {
                 method: "POST",
@@ -105,7 +105,7 @@ export class ImageTaken extends React.Component<Props, State> {
                                     id: marker.id,
                                     types: marker.types,
                                     photo: `file://${RNFetchBlob.fs.dirs.SDCardDir}/Iter/${marker.pictures[0]}`,
-                                    distance: this.state.posTaken  && marker.pos ? CalculateDistance(this.state.posTaken.latitude, this.state.posTaken.longitude, marker.pos.latitude, marker.pos.longitude) : 25,
+                                    distance: this.state.posTaken && marker.pos ? CalculateDistance(this.state.posTaken.latitude, this.state.posTaken.longitude, marker.pos.latitude, marker.pos.longitude) : 25,
                                     pos: marker.pos,
                                 })
                             }
@@ -253,7 +253,7 @@ export class ImageTaken extends React.Component<Props, State> {
                                                             title: this.state.customName,
                                                             types: [this.state.customType]
                                                         });
-                                                    } else{
+                                                    } else {
                                                         route.markers.push({
                                                             id: `unknown_${(new Date()).getTime()}`,
                                                             description: "",
@@ -373,7 +373,7 @@ export class ImageTaken extends React.Component<Props, State> {
                                             <View style={{ position: "absolute", right: 0, bottom: d.height * 0.05, width: d.width * 0.1, height: d.width * 0.1, backgroundColor: "#242424", elevation: 6, alignItems: "center", flexDirection: "row", justifyContent: "center", borderRadius: 5 }}>
                                                 <TouchableOpacity
                                                     onPress={() => {
-                                                        this.setState({ selectedPlace: id, selectingPlace: false, selectedPlacePos: pos, customName: name, customType: types[0]});
+                                                        this.setState({ selectedPlace: id, selectingPlace: false, selectedPlacePos: pos, customName: name, customType: types[0] });
                                                     }}
                                                 >
                                                     <Icon name="map-marker-check" color="white" size={42} />

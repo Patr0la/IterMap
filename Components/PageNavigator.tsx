@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { Text, Button, View, Image, StyleSheet, PermissionsAndroid, Dimensions, TouchableOpacity, TextInput } from "react-native";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { Search } from "../Components/Search";
+import { SearchBox } from "./SearchBox";
 import { RoutesPreview } from "../Components/RoutesPreview";
 
 interface Props {
@@ -34,7 +34,7 @@ export class PageNavigator extends React.Component<Props, State> {
         }
     }
 
-    Searchbar: Search;
+    Searchbar: SearchBox;
     render() {
         let width = d.width / this.props.routes.length;
         return (

@@ -4,7 +4,7 @@ import { Text, Button, View, Image, StyleSheet, PermissionsAndroid, Dimensions, 
 import Geolocation from "react-native-geolocation-service";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { Search } from "../Components/Search";
+import { SearchBox } from "../Components/SearchBox";
 import { RoutesPreview } from "../Components/RoutesPreview";
 
 import BackgroundGeolocation, { Location } from "@mauron85/react-native-background-geolocation";
@@ -16,6 +16,16 @@ import { Camera } from "./Camera";
 import { LiveRoute } from "./LiveRoute";
 
 import ViewPager from "@react-native-community/viewpager";
+
+import {
+    AdMobBanner,
+    PublisherBanner,
+} from 'react-native-admob'
+
+import RNFetchBlob from "rn-fetch-blob";
+
+import * as config from "../Config.json";
+import { LoadingElement } from "../Components/LoadingElement";
 
 interface Props extends IProps { }
 
@@ -40,19 +50,47 @@ export class Home extends React.Component<Props, State> {
         PermissionsAndroid.request("android.permission.BODY_SENSORS");
         Geolocation.requestAuthorization();
 
+        Geolocation.getCurrentPosition(
+            pos => {
+                fetch(`http://${config.host}/reverseGeoCode`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                        Cookie: `session=${this.props.data.token}`,
+                        "Content-Type": "application/json",
+                    },
+
+                    body: JSON.stringify({
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude,
+                    }),
+                })
+                    .then(res => res.json())
+                    .then(({ city, county, country }) => {
+                        this.props.data.lastLocation = { city, county, country, pos: { latitude: pos.coords.latitude, longitude: pos.coords.longitude } };
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            },
+            err => {
+                console.log(err);
+            },
+            { enableHighAccuracy: true, maximumAge: 60000, timeout: 20000 }
+        );
+
         this.state = {
             viewing: "world",
             scrollEnabled: true,
         };
-4
     }
 
-    Searchbar: Search;
+    Searchbar: SearchBox;
 
     home() {
         return (
             <View>
-                <Search
+                <SearchBox
                     placeHolder={this.state.currentStepCount?.toString()} //"Search for routes"
                     ref={ref => (this.Searchbar = ref)}
                     endpoint="findRoutes"
@@ -82,6 +120,36 @@ export class Home extends React.Component<Props, State> {
                             </TouchableOpacity>
                         </View>
                     )}
+
+
+                {/*<AdMobBanner
+                    adSize="smartBannerPortrait"
+                    bannerSize="smartBannerPortrait"
+                    adUnitID="ca-app-pub-2152308991050720/3360133038"
+                    //testDevices={[AdMobBanner.simulatorId]}
+                    didFailToReceiveAdWithError={(err) => {
+                        console.log(err)
+                    }}
+                    onAdLoaded={() => {
+                        console.log("onAdLoaded");
+                    }}
+                    onAdFailedToLoad={(err) => {
+                        console.log("onAdFailedToLoad");
+                        console.log(err)
+                    }}
+                    onAdOpened={() => {
+                        console.log("onAdOpened");
+                    }}
+                    onAdClosed={() => {
+                        console.log("onAdClosed");
+                    }}
+                    onAdLeftApplication={() => {
+                        console.log("onAdLeftApplication");
+                    }}
+                    onSizeChange={() => {
+                        console.log("onSizeChange");
+                    }}
+                />*/}
             </View>
         );
     }
@@ -130,6 +198,19 @@ export class Home extends React.Component<Props, State> {
     }
 
     componentDidMount() {
+        // AsyncStorage.getItem(DataKeys.liveRoutesTracking, (err, res) => {
+        //     let liveRoutes = JSON.parse(res) as Array<{ id: string; name: string; tracking: boolean }>;
+
+        //     liveRoutes.forEach(({id}) => {
+        //         AsyncStorage.getItem(`live_${id}`, (err, res) => {
+        //             if (err) return console.log(err);
+        //             if (!res) return;
+
+        //             RNFetchBlob.fs.writeFile(`${RNFetchBlob.fs.dirs.SDCardDir}/Iter/${(new Date).getTime()}.json`, res);
+        //         });
+        //     })
+        // });
+
         BackgroundGeolocation.configure({
             desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
             stationaryRadius: 10,
@@ -137,14 +218,14 @@ export class Home extends React.Component<Props, State> {
             notificationTitle: "Iter - route tracking",
             notificationText: "Tracking enabled",
             notificationsEnabled: true,
-            debug: true,
+            debug: false,
             stopOnTerminate: false,
             locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
             interval: 10000,
             fastestInterval: 5000,
             activitiesInterval: 10000,
             stopOnStillActivity: false,
-            startOnBoot: true,
+            startOnBoot: false,
             startForeground: true,
         });
 
@@ -210,14 +291,14 @@ export class Home extends React.Component<Props, State> {
 
 var lastPoints = [];
 function procesPoint(point: Location, data: IUserData) {
-    let { accuracy, longitude, latitude, altitude, time } = point;
-    data.lastPos = { accuracy, longitude, latitude, altitude, time }
+    let { accuracy, longitude, latitude, altitude, time, speed } = point;
+    data.lastPos = { accuracy, longitude, latitude, altitude, time, speed }
 
 
     // console.log(data.lastPos)
 
     // return false;
-    
+
     if (lastPoints.length > 20) {
         lastPoints.shift();
         lastPoints.push();
@@ -230,7 +311,7 @@ function procesPoint(point: Location, data: IUserData) {
         if (err) return console.log(err);
         let liveRoutesTracking = JSON.parse(res);
 
-        console.log(`${latitude} : ${longitude} :: ${point.accuracy}`);
+        console.log(`${latitude} : ${longitude} :: ${point.accuracy} : ${point.speed}`);
         if (liveRoutesTracking && liveRoutesTracking.length > 0) {
             liveRoutesTracking.forEach(({ id }) => {
                 AsyncStorage.getItem(`live_${id}`, (err, res) => {
@@ -239,11 +320,12 @@ function procesPoint(point: Location, data: IUserData) {
 
                     let r: ILiveRoute = JSON.parse(res);
                     r.path.push({
-                        accuracy: point.accuracy,
+                        accuracy,
                         latitude,
                         longitude,
-                        altitude: point.altitude,
-                        time: point.time,
+                        altitude,
+                        time,
+                        speed,
                     });
 
                     AsyncStorage.setItem(`live_${id}`, JSON.stringify(r), err => {

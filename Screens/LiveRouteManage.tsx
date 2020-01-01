@@ -3,7 +3,7 @@ import { Text, Button, View, Image, StyleSheet, PermissionsAndroid, Dimensions, 
 
 import Geolocation from "react-native-geolocation-service";
 
-import { Search } from "../Components/Search";
+import { SearchBox } from "../Components/SearchBox";
 import { RoutesPreview } from "../Components/RoutesPreview";
 import { PageNavigator } from "../Components/PageNavigator";
 import AsyncStorage from "@react-native-community/async-storage";
@@ -36,7 +36,7 @@ export class LiveRouteManage extends React.Component<Props, State> {
         };
     }
 
-    Searchbar: Search;
+    Searchbar: SearchBox;
     render() {
         return (
             <View style={{ ...StyleSheet.absoluteFillObject }}>

@@ -13,7 +13,7 @@ export class TraveledBy extends React.Component<Props> {
     }
 
     render() {
-        const traveled = this.props.traveledBy.map(v => <Icon name={travelIcons[v]} size={30} color="white"/>);
+        const traveled = this.props.traveledBy.map((v, i) => <Icon key={i} name={travelIcons[v]} size={30} color="white"/>);
         if (traveled.length != 0) return ( <Text>{traveled}</Text> );
         return null;
     }

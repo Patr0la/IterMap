@@ -1,8 +1,11 @@
 import React from "react";
-import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput } from "react-native";
+import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, Dimensions } from "react-native";
 import { DataKeys } from "../UserData";
 
 import * as config from "../Config.json";
+
+import { AnimatedSVGPath } from 'react-native-svg-animations';
+import { LoadingElement } from "../Components/LoadingElement";
 
 interface State { }
 
@@ -15,7 +18,12 @@ export class LoadingScreen extends React.Component<IProps, State> {
         props.data.initilize(
             () => {
                 if (props.data.token) {
-                    props.navigation.navigate("Home");
+                    setTimeout(() => {
+                        console.log("reeee")
+                        props.navigation.navigate("Home");
+                    }, 1000)
+                    console.log("UGH")
+                    
                     goneHome = true;
                 } else {
                     props.navigation.navigate("Login");
@@ -28,20 +36,28 @@ export class LoadingScreen extends React.Component<IProps, State> {
     }
 
     render() {
+        // return <View></View>
         return (
             <View style={styles.container}>
-                <Text> Loading ...</Text>
+                
+                <LoadingElement height={22} width={30} scale={3} animating={true} strokeColor="#ad0a4c" fill="#242424"></LoadingElement><Text style={{fontSize: 100, color: "#242424"}}>ter</Text>
             </View>
         );
     }
 }
 
+const d = Dimensions.get("screen");
+
+
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "white",
         alignItems: "center",
         justifyContent: "center",
-        height: "100%",
+        height: d.height,
+        width: d.width,
+        flexDirection: "row",
+        
+
     },
 });

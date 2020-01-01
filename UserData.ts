@@ -1,4 +1,4 @@
-import {} from "react-native";
+import { } from "react-native";
 
 import Geolocation from "react-native-geolocation-service";
 
@@ -99,7 +99,7 @@ export class UserData implements IUserData {
         }
     }
 
-    private postInitialization(callback: () => void) {}
+    private postInitialization(callback: () => void) { }
 
     private _username: string;
     public get username(): string {
@@ -131,14 +131,14 @@ export class UserData implements IUserData {
         });
     }
 
-    private _lastPos : ILivePos;
-    public get lastPos() : ILivePos {
+    private _lastPos: ILivePos;
+    public get lastPos(): ILivePos {
         return this._lastPos;
     }
-    public set lastPos(v : ILivePos) {
+    public set lastPos(v: ILivePos) {
         this._lastPos = v;
     }
-    
+
 
     private _myRoutes: Array<IRoute>;
     public get myRoutes(): Array<IRoute> {
@@ -148,7 +148,7 @@ export class UserData implements IUserData {
         this._myRoutes = v;
 
         AsyncStorage.setItem(DataKeys.myRoutes, JSON.stringify(v), err => {
-            err &&  console.log(err); // ERR handle
+            err && console.log(err); // ERR handle
         });
     }
 
@@ -235,6 +235,54 @@ export class UserData implements IUserData {
             err && console.log(err); // ERR handle
         });
     }
+
+    private _displayHeatMap: boolean;
+    public get displayHeatMap(): boolean {
+        return this._displayHeatMap;
+    }
+    public set displayHeatMap(v: boolean) {
+        this._displayHeatMap = v;
+
+        AsyncStorage.setItem(DataKeys.displayHeatMap, JSON.stringify(v), err => {
+            err && console.log(err); // ERR handle
+        });
+    }
+
+    private _displayMarkers: boolean;
+    public get displayMarkers(): boolean {
+        return this._displayMarkers;
+    }
+    public set displayMarkers(v: boolean) {
+        this._displayMarkers = v;
+
+        AsyncStorage.setItem(DataKeys.displayMarkers, JSON.stringify(v), err => {
+            err && console.log(err); // ERR handle
+        });
+    }
+
+    private _displayPath: boolean;
+    public get displayPath(): boolean {
+        return this._displayPath;
+    }
+    public set displayPath(v: boolean) {
+        this._displayPath = v;
+
+        AsyncStorage.setItem(DataKeys.displayPath, JSON.stringify(v), err => {
+            err && console.log(err); // ERR handle
+        });
+    }
+
+    private _displaySatelite: boolean;
+    public get displaySatelite(): boolean {
+        return this._displaySatelite;
+    }
+    public set displaySatelite(v: boolean) {
+        this._displaySatelite = v;
+
+        AsyncStorage.setItem(DataKeys.displaySatelite, JSON.stringify(v), err => {
+            err && console.log(err); // ERR handle
+        });
+    }
 }
 
 export enum DataKeys {
@@ -251,6 +299,11 @@ export enum DataKeys {
     cameraFront = "cameraFront",
     displayAngle = "displayAngle",
     flash = "flash",
+
+    displayHeatMap = "displayHeatMap",
+    displayMarkers = "displayMarkers",
+    displayPath = "displayPath",
+    displaySatelite = "displaySatelite",
 }
 
-const DataKeysInJson: Array<string> = [DataKeys.lastLocation, DataKeys.myProfileInfo, DataKeys.myRoutes, DataKeys.liveRoutesInCreation, DataKeys.liveRoutesTracking, DataKeys.grid, DataKeys.cameraFront, DataKeys.displayAngle, DataKeys.flash];
+const DataKeysInJson: Array<string> = [DataKeys.lastLocation, DataKeys.myProfileInfo, DataKeys.myRoutes, DataKeys.liveRoutesInCreation, DataKeys.liveRoutesTracking, DataKeys.grid, DataKeys.cameraFront, DataKeys.displayAngle, DataKeys.flash, DataKeys.displayHeatMap, DataKeys.displayMarkers, DataKeys.displayPath, DataKeys.displaySatelite,];

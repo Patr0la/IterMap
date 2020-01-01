@@ -1,10 +1,11 @@
 import React from 'react';
-import {Text, Image, View, StyleSheet, RefreshControl, Dimensions} from 'react-native';
-import {RoutesPreview} from '../Components/RoutesPreview';
-import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
+import { Text, Image, View, StyleSheet, RefreshControl, Dimensions } from 'react-native';
+import { RoutesPreview } from '../Components/RoutesPreview';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 
 import * as config from '../Config.json';
-import {Search} from '../Components/Search';
+
+import { PageNavigator } from '../Components/PageNavigator';
 
 interface State extends IProfileEntry {
     routesData?: Array<IRoute>;
@@ -19,7 +20,7 @@ export class Profile extends React.Component<IProps, State> {
         super(props);
 
         this.state = {
-            viewing: 'routes',
+            viewing: 'about',
         };
     }
 
@@ -33,10 +34,10 @@ export class Profile extends React.Component<IProps, State> {
         })
             .then(res => res.json())
             .then(profileInfo => {
-                this.setState({...profileInfo, refreshing: false});
+                this.setState({ ...profileInfo, refreshing: false });
             })
             .catch(reason => {
-                this.setState({refreshing: false});
+                this.setState({ refreshing: false });
                 console.log(reason);
             });
 
@@ -49,10 +50,10 @@ export class Profile extends React.Component<IProps, State> {
         })
             .then(res => res.json())
             .then(routesData => {
-                this.setState({routesData, refreshing: false});
+                this.setState({ routesData, refreshing: false });
             })
             .catch(reason => {
-                this.setState({refreshing: false});
+                this.setState({ refreshing: false });
                 console.log(reason);
             });
     }
@@ -68,7 +69,7 @@ export class Profile extends React.Component<IProps, State> {
 
         return (
             <View>
-                <Search
+               {/*<Search
                     placeHolder="Search for routes"
                     ref={ref => (this.Searchbar = ref)}
                     endpoint="findRoutes"
@@ -78,17 +79,15 @@ export class Profile extends React.Component<IProps, State> {
                     onSelectCallback={selection => {
                         console.log(selection); // TODO Navigate to thism
                     }}
-                />
-                <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-                    <TouchableOpacity style={{...styles.button, ...(this.state.viewing == 'about' ? {borderBottomColor: '#ad0a4c', borderBottomWidth: 4} : {})}} onPress={() => this.setState({viewing: 'about'})}>
-                        <Text style={styles.buttonText}>Nearby</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{...styles.button, ...(this.state.viewing == 'routes' ? {borderBottomColor: '#ad0a4c', borderBottomWidth: 4} : {})}} onPress={() => this.setState({viewing: 'routes'})}>
-                        <Text style={styles.buttonText}>{this.props.data.lastLocation.country}</Text>
-                    </TouchableOpacity>
-                </View>
+                />*/}
+                <PageNavigator default="about" routes={[{ title: "About", value: "about" }, { title: "Routes", value: "routes" }]} onSelectionChange={(viewing) => this.setState({ viewing })} />
 
-                <View>{this.state.routesData && <RoutesPreview routeData={this.state.routesData} navigation={this.props.navigation} data={this.props.data}></RoutesPreview>}</View>
+                {this.state.viewing == "about" ?
+                    (<View>
+                        <Text></Text>
+                    </View>) : (
+                        <View>{this.state.routesData && <RoutesPreview routeData={this.state.routesData} navigation={this.props.navigation} data={this.props.data}></RoutesPreview>}</View>
+                    )}
             </View>
         );
     }
