@@ -10,11 +10,11 @@ import { MapStyle } from "../MapStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface Props extends IProps, IRoute {
-	addMarker: (pos: IPos, id? : string, name?: string) => void;
+	handlers: IMarkerUpdateHandlers;
 }
 
-interface State extends IRoute {
-    displayHeatMap: boolean;
+interface State {
+	displayHeatMap: boolean;
 	displayMarkers: boolean;
 	displayPath: boolean;
 	displaySatelite: boolean;
@@ -29,9 +29,9 @@ export class EditMap extends React.Component<Props, State> {
 		super(props);
 
 		this.state = {
-            ...props,
-            
-            displayHeatMap: props.data.displayHeatMap,
+			...props,
+
+			displayHeatMap: props.data.displayHeatMap,
 			displayMarkers: props.data.displayMarkers,
 			displayPath: props.data.displayPath,
 			displaySatelite: props.data.displaySatelite,
@@ -44,15 +44,21 @@ export class EditMap extends React.Component<Props, State> {
 	loaded: boolean;
 
 	render() {
-		if (this.state.markers)
-			this.markersOnMap = this.state.markers.map((m, i) => (
-				<Marker coordinate={m.pos} key={i}>
-					<View style={{ width: 56, height: 56 }}>
-						<Icon name="map-marker" size={56} style={{ position: "absolute" /*marginTop: 5*/ }} color="#242424" />
-						{m.pictures && m.pictures[0] && <BetterImage url={`http://${config.host}/routeImages?route=${this.state._id}&image=${m.pictures[0]}`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32, marginLeft: 12, marginTop: 6 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>}
-					</View>
-				</Marker>
-			));
+		if (this.props.markers)
+			this.markersOnMap = this.props.markers.reduce(
+				(pv, m, i) =>
+					!m.isLogicMarker
+						? pv.concat(
+								<Marker coordinate={m.pos} key={i}>
+									<View style={{ width: 56, height: 56 }}>
+										<Icon name="map-marker" size={56} style={{ position: "absolute" /*marginTop: 5*/ }} color="#242424" />
+										{m.pictures && m.pictures[0] && <BetterImage url={`${config.host}/routeImages?route=${this.props._id}&image=${m.pictures[0]}`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32, marginLeft: 12, marginTop: 6 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>}
+									</View>
+								</Marker>,
+						  )
+						: pv,
+				[],
+			);
 
 		// if (this.MapView && (this.state.path?.length > 2 || this.state.livePath?.length)) {
 		// 	this.MapView.fitToCoordinates(this.state.path?.length > 2 ? this.state.path : this.state.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } });
@@ -62,7 +68,21 @@ export class EditMap extends React.Component<Props, State> {
 			<View style={{ width: "100%", height: d.height / 2, zIndex: 1, padding: "5%", alignItems: "flex-end", flexDirection: "column", justifyContent: "space-between" }}>
 				<MapView
 					cacheEnabled
-					onPoiClick={(e) => this.props.addMarker(e.nativeEvent.coordinate, e.nativeEvent.placeId, e.nativeEvent.name)}
+					onPoiClick={(e) =>
+						this.props.handlers.addMarker({
+							isLogicMarker: false,
+							logicFunction: "location",
+							pictures: [],
+							pos: e.nativeEvent.coordinate,
+							title: e.nativeEvent.name,
+							description: "",
+							price: { currency: "€", value: 0 },
+							time: "",
+							id: e.nativeEvent.placeId,
+							types: [],
+							day: this.props.markers.reduce((pv, { day }) => Math.max(pv, day), 0),
+						})
+					}
 					ref={(ref) => (this.MapView = ref)}
 					//onLayout={() => this.props.onMapLayout()}
 					style={styles.map}
@@ -76,16 +96,28 @@ export class EditMap extends React.Component<Props, State> {
 					// 	longitudeDelta: 0.02,
 					// }}
 					onPress={(e) => {
-						this.props.addMarker(e.nativeEvent.coordinate);
+						this.props.handlers.addMarker({
+							isLogicMarker: false,
+							logicFunction: "location",
+							pictures: [],
+							pos: e.nativeEvent.coordinate,
+							title: "Untitled",
+							description: "",
+							price: { currency: "€", value: 0 },
+							time: "",
+							id: `marker_${new Date().getTime()}`,
+							types: [],
+							day: this.props.markers.reduce((pv, { day }) => Math.max(pv, day), 0),
+						});
 					}}
 					onMarkerPress={(e) => {
 						console.log(e);
 					}}
-					onLayout={(e) => (this.state.path?.length > 2 ? this.MapView.fitToCoordinates(this.state.path, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } }) : this.state.livePath?.length ? this.MapView.fitToCoordinates(this.state.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } }) : null)}
+					onLayout={(e) => (this.props.path?.length > 2 ? this.MapView.fitToCoordinates(this.props.path, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } }) : this.props.livePath?.length ? this.MapView.fitToCoordinates(this.props.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } }) : null)}
 				>
 					{this.markersOnMap}
-					{this.state && this.state.path && this.state.path.length > 1 && <Polyline coordinates={this.state.path} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
-					{this.state && this.state.livePath && this.state.livePath.length > 1 && <Polyline coordinates={this.state.livePath} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
+					{this.state && this.props.path && this.props.path.length > 1 && <Polyline coordinates={this.props.path} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
+					{this.state && this.props.livePath && this.props.livePath.length > 1 && <Polyline coordinates={this.props.livePath} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
 				</MapView>
 
 				<View style={{ flexDirection: "column", alignSelf: "flex-end", justifyContent: "center", alignItems: "center", ...(this.state.displayOptions ? { backgroundColor: "white", borderRadius: 5, elevation: 5 } : {}) }}>

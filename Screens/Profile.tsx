@@ -25,7 +25,7 @@ export class Profile extends React.Component<IProps, State> {
     }
 
     loadData() {
-        fetch(this.loadedUsername == this.props.data.username ? `http://${config.host}/myProfileInfo` : `http://${config.host}/userProfileInfo?username=${this.loadedUsername}`, {
+        fetch(this.loadedUsername == this.props.data.username ? `${config.host}/myProfileInfo` : `${config.host}/userProfileInfo?username=${this.loadedUsername}`, {
             headers: {
                 Accept: 'application/json',
                 Cookie: `session=${this.props.data.token}`,
@@ -41,7 +41,7 @@ export class Profile extends React.Component<IProps, State> {
                 console.log(reason);
             });
 
-        fetch(this.loadedUsername == this.props.data.username ? `http://${config.host}/getMyRoutes` : `http://${config.host}/getUserRoutes?username=${this.loadedUsername}`, {
+        fetch(this.loadedUsername == this.props.data.username ? `${config.host}/getMyRoutes` : `${config.host}/getUserRoutes?username=${this.loadedUsername}`, {
             headers: {
                 Accept: 'application/json',
                 Cookie: `session=${this.props.data.token}`,

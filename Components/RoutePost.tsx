@@ -38,7 +38,7 @@ export class RoutePost extends React.Component<Props, State> {
                     )}
                 </View>
 
-                <BetterImage imageSource="web" parentViewStyle={{ height: 360, width: "100%" }} imageStyle={styles.image} data={this.props.data} navigation={this.props.navigation} url={`http://${config.host}/routeImage?id=${this.props._id}`}></BetterImage>
+                <BetterImage imageSource="web" parentViewStyle={{ height: 360, width: "100%" }} imageStyle={styles.image} data={this.props.data} navigation={this.props.navigation} url={`${config.host}/routeImage?id=${this.props._id}`}></BetterImage>
 
                 <View style={{ width: "100%", height: 4, backgroundColor: "#242424" }}></View>
 

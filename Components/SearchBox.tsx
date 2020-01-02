@@ -56,7 +56,7 @@ export class SearchBox extends React.Component<Props, State> {
 			return;
 		}
 
-		fetch(`http://${config.host}/${this.props.endpoint}`, {
+		fetch(`${config.host}/${this.props.endpoint}`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
@@ -140,7 +140,7 @@ export class SearchBox extends React.Component<Props, State> {
 									console.log(this.props.endpoint);
 
 									if (this.props.endpoint == "findLocation")
-										fetch(`http://${config.host}/findLocationGetLocationData`, {
+										fetch(`${config.host}/findLocationGetLocationData`, {
 											method: "POST",
 											headers: {
 												Accept: "application/json",

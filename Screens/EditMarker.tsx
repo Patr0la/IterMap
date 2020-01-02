@@ -78,7 +78,7 @@ export class EditMarker extends Component<Props, State> {
 
 				<View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
 					{mainPic ? (
-						<BetterImage url={`http://${config.host}/routeImages?route=${this.state.routeId}&image=${mainPic}`} imageSource="web" cacheImage={false} imageStyle={{ width: "100%", height: "100%", borderRadius: 32 }} parentViewStyle={{ width: 64, height: 64, marginTop: 10, marginLeft: 20 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>
+						<BetterImage url={`${config.host}/routeImages?route=${this.state.routeId}&image=${mainPic}`} imageSource="web" cacheImage={false} imageStyle={{ width: "100%", height: "100%", borderRadius: 32 }} parentViewStyle={{ width: 64, height: 64, marginTop: 10, marginLeft: 20 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>
 					) : (
 						<TouchableOpacity
 							onPress={() => {
@@ -95,7 +95,7 @@ export class EditMarker extends Component<Props, State> {
 										// console.log(res)
 										// this.setState({ mainPicSource: res[0]. }); // TODO image check, mini width etc..
 
-										// fetch(`http://${config.host}/uploadMarkerPicture`, {
+										// fetch(`${config.host}/uploadMarkerPicture`, {
 										// 	method: "POST",
 										// 	headers: {
 										// 		Accept: "application/json",
@@ -145,7 +145,7 @@ export class EditMarker extends Component<Props, State> {
 									// console.log(res)
 									// this.setState({ mainPicSource: res[0]. }); // TODO image check, mini width etc..
 
-									// fetch(`http://${config.host}/uploadMarkerPicture`, {
+									// fetch(`${config.host}/uploadMarkerPicture`, {
 									// 	method: "POST",
 									// 	headers: {
 									// 		Accept: "application/json",

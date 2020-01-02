@@ -13,237 +13,129 @@ interface Props extends IProps {
 	routeId: string;
 
 	i: number;
+	top: number;
 
 	map: EditMap;
 	markers: Array<IMarker>;
-	markerElements: Array<Marker>;
 
-	onMarkerUpdate: (markers: Array<IMarker>) => void;
+	handlers: IMarkerUpdateHandlers;
 
-	scrollFor: (n: number) => void;
+	selectedDay: number;
 }
 
 interface State {
-	i: number;
-	top: number;
-
-	markers: Array<IMarker>;
-	markerElements: Array<Marker>;
-
-	lastPosition: number;
-	canCallScrollTo: boolean;
-	exists: boolean;
+	// i: number;
+	// top: number;
+	// markers: Array<IMarker>;
+	// markerElements: Array<Marker>;
+	// lastPosition: number;
+	// canCallScrollTo: boolean;
+	// exists: boolean;
 }
 
 export class Marker extends React.Component<Props, State> {
 	_panResponder: PanResponderInstance;
 	constructor(props: Props) {
 		super(props);
-
-		this.state = {
-			i: props.i,
-			markers: props.markers,
-			markerElements: props.markerElements,
-
-			top: props.i * 80,
-			lastPosition: 0,
-			canCallScrollTo: true,
-
-			exists: true,
-		};
-
-		const miniMoveX = d.width - 90;
-		this._panResponder = PanResponder.create({
-			onStartShouldSetPanResponder: (e, gs) => e.nativeEvent.pageX > miniMoveX,
-			onStartShouldSetPanResponderCapture: (e, gs) => e.nativeEvent.pageX > miniMoveX,
-			onMoveShouldSetPanResponder: (e, gs) => e.nativeEvent.pageX > miniMoveX,
-			onMoveShouldSetPanResponderCapture: (e, gs) => e.nativeEvent.pageX > miniMoveX,
-			onPanResponderTerminationRequest: (e, gs) => false,
-			onShouldBlockNativeResponder: (e, gs) => true,
-
-			onPanResponderGrant: (e, gs) => {
-				this.props.map?.MapView?.fitToCoordinates(
-					this.state.markers.slice(this.state.i - 2 >= 0 ? this.state.i - 2 : 0, this.state.i + 3 < this.state.markers.length ? this.state.i + 3 : this.state.markers.length).map((m) => m.pos),
-					{
-						animated: true,
-						edgePadding: { bottom: 40, top: 40, left: 40, right: 40 },
-					},
-				);
-				console.log("start");
-				this.setState({ lastPosition: e.nativeEvent.pageY });
-			},
-			onPanResponderMove: (e, gs) => {
-				let dy = e.nativeEvent.pageY - this.state.lastPosition;
-
-				this.setState({ top: this.state.top + dy, lastPosition: e.nativeEvent.pageY });
-				if (this.state.canCallScrollTo) {
-					if (e.nativeEvent.pageY > d.height * 0.9) {
-						this.props.scrollFor(100);
-						this.setState({ top: this.state.top + 100, lastPosition: e.nativeEvent.pageY, canCallScrollTo: false });
-						setTimeout(() => {
-							this.setState({ canCallScrollTo: true });
-						}, 1000);
-					}
-				}
-
-				let ni = Math.ceil(this.state.top / 80 - 0.5);
-				if (this.state.i < ni && ni < this.state.markers.length) {
-					let _still = this.state.markers.slice(0, this.state.i);
-					let _toMove = this.state.markers.slice(this.state.i + 1, ni + 1);
-					let _end = this.state.markers.slice(ni + 1, this.state.markers.length);
-
-					let markers = [..._still, ..._toMove, this.state.markers[this.state.i], ..._end];
-
-					let still = this.state.markerElements.slice(0, this.state.i);
-					let toMove = this.state.markerElements.slice(this.state.i + 1, ni + 1);
-					let end = this.state.markerElements.slice(ni + 1, this.state.markers.length);
-
-					let markerElements = [...still, ...toMove, this.state.markerElements[this.state.i], ...end];
-
-					still.forEach((m) => {
-						m.setState({
-							markers: markers,
-							markerElements: markerElements,
-						});
-					});
-
-					end.forEach((m) => {
-						m?.setState({
-							markers: markers,
-							markerElements: markerElements,
-						});
-					});
-
-					toMove.forEach((m) => {
-						m.setState({
-							top: (m.state.i - 1) * 80,
-							i: m.state.i - 1,
-							markers: markers,
-							markerElements: markerElements,
-						});
-
-						console.log(m.state);
-					});
-
-					this.setState({
-						markers: markers,
-						markerElements: markerElements,
-						i: ni,
-					});
-
-					this.props.onMarkerUpdate(markers);
-
-					this.props.map.MapView?.fitToCoordinates(
-						markers.slice(ni - 2 >= 0 ? ni - 2 : 0, ni + 3 < markers.length ? ni + 3 : markers.length).map((m) => m.pos),
-						{
-							animated: true,
-							edgePadding: { bottom: 40, top: 40, left: 40, right: 40 },
-						},
-					);
-				} else if (this.state.i > ni && ni >= 0) {
-					let _still = this.state.markers.slice(0, ni);
-					let _toMove = this.state.markers.slice(ni, this.state.i);
-					let _end = this.state.markers.slice(this.state.i + 1, this.state.markers.length);
-
-					let still = this.state.markerElements.slice(0, ni);
-					let toMove = this.state.markerElements.slice(ni, this.state.i);
-					let end = this.state.markerElements.slice(this.state.i + 1, this.state.markerElements.length);
-
-					let markers = [..._still, this.state.markers[this.state.i], ..._toMove, ..._end];
-					let markerElements = [...still, this.state.markerElements[this.state.i], ...toMove, ...end];
-
-					still.forEach((m) => {
-						if (m)
-							m.setState({
-								markers: markers,
-								markerElements: markerElements,
-							});
-					});
-
-					end.forEach((m) => {
-						if (m)
-							m.setState({
-								markers: markers,
-								markerElements: markerElements,
-							});
-					});
-
-					toMove.forEach((m) => {
-						m.setState({
-							top: m.state.top + 80,
-							i: m.state.i + 1,
-							markers: markers,
-							markerElements: markerElements,
-						});
-					});
-
-					this.setState({
-						markers: markers,
-						markerElements: markerElements,
-						i: ni,
-					});
-
-					this.props.onMarkerUpdate(markers);
-
-					this.props.map.MapView?.fitToCoordinates(
-						markers.slice(ni - 2 >= 0 ? ni - 2 : 0, ni + 3 < markers.length ? ni + 3 : markers.length).map((m) => m.pos),
-						{
-							animated: true,
-							edgePadding: { bottom: 40, top: 40, left: 40, right: 40 },
-						},
-					);
-				}
-			},
-			onPanResponderRelease: (e, gs) => {
-				this.setState({
-					top: this.state.i * 80,
-				});
-			},
-			onPanResponderTerminate: (e, gs) => {},
-		});
 	}
 
 	render() {
-		if (!this.state.exists || !this.state || !this.state.markers[this.state.i]) return null;
+		let marker = this.props.markers[this.props.i];
+		if (marker.isLogicMarker) {
+			return (
+				<View
+					style={{ ...styles.marker, top: this.props.top, justifyContent: "center" }}
+					onTouchEnd={() => {
+						this.props.handlers.onDaySelect(marker.day);
+						let done = false;
+						let cords = this.props.markers.reduce((pv, { logicFunction, day, pos }, i) => {
+							if (done) return pv;
+							if (logicFunction == "day" && i > this.props.i && day > marker.day) {
+								done = true;
+								return pv;
+							}
+							if (i > this.props.i && pos) {
+								return pv.concat(pos);
+							}
+							return pv;
+						}, []);
+
+						cords?.length > 0 && this.props.map.MapView.fitToCoordinates(cords, { animated: true, edgePadding: { bottom: 20, top: 100, left: 50, right: 50 } });
+					}}
+				>
+					<Text style={{ marginHorizontal: "5%" }}>{marker.title}</Text>
+					<View style={{ flex: 1, height: 2, backgroundColor: this.props.selectedDay == marker.day ? "#ad0a4c" : "#242424", marginRight: marker.day > 1 ? 0 : 16 }} />
+
+					{marker.day != 1 && (
+						<TouchableOpacity
+							onPress={() => {
+								this.props.handlers.removeMarkerAtPosition(this.props.i);
+							}}
+						>
+							<Icon name="close" size={32} color="red" />
+						</TouchableOpacity>
+					)}
+
+					{marker.day > 1 && (
+						<View style={{ width: 60, height: 60, alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+							{this.props.i > 0 && (
+								<TouchableOpacity
+									onPress={() => {
+										this.props.handlers.switchMarkers(this.props.i - 1, this.props.i);
+									}}
+								>
+									<Icon name="chevron-up" size={24} color="#242424"></Icon>
+								</TouchableOpacity>
+							)}
+
+							{this.props.i < this.props.markers.length - 1 && (
+								<TouchableOpacity
+									onPress={() => {
+										this.props.handlers.switchMarkers(this.props.i + 1, this.props.i);
+									}}
+								>
+									<Icon name="chevron-down" size={24} color="#242424"></Icon>
+								</TouchableOpacity>
+							)}
+						</View>
+					)}
+				</View>
+			);
+		}
+
 		return (
 			<View
 				onTouchEnd={(e) => {
-					e.nativeEvent.pageX < d.width - 90 && this.props.map.MapView?.animateCamera({ center: this.state.markers[this.state.i].pos });
+					e.nativeEvent.pageX < d.width - 90 && this.props.map.MapView?.animateCamera({ center: marker.pos });
 				}}
 				// {...this._panResponder.panHandlers} // TODO prebaciti se na slider, trenutačno previše glitcha
-				style={{ ...styles.marker, top: this.state.top }}
+				style={{ ...styles.marker, top: this.props.top }}
 			>
-				{this.state.markers[this.state.i].pictures[0] && <BetterImage url={`http://${config.host}/routeImages?route=${this.props.routeId}&image=${this.state.markers[this.state.i].pictures[0]}`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>}
+				{marker.pictures[0] && <BetterImage url={`${config.host}/routeImages?route=${this.props.routeId}&image=${marker.pictures[0]}`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>}
 				<Text
 					onPress={() => {
-						this.props.map.MapView?.animateCamera({ center: this.state.markers[this.state.i].pos });
+						this.props.map.MapView?.animateCamera({ center: marker.pos });
 					}}
 					style={{ flexGrow: 10, marginLeft: 6, color: "#242424" }}
 				>
-					{this.state.markers[this.state.i].title}
+					{marker.title}
 				</Text>
-				<View
-					onTouchEnd={() => {
-						let _still = this.state.markers.slice(0, this.state.i);
-						let _toMove = this.state.markers.slice(this.state.i + 1, this.state.markers.length);
-
-						let still = this.state.markerElements.slice(0, this.state.i);
-						let toMove = this.state.markerElements.slice(this.state.i + 1, this.state.markers.length);
-
-						let markers = [..._still, ..._toMove];
-						let markerElements = [...still, ...toMove];
-
-						this.props.onMarkerUpdate(markers);
+				<TouchableOpacity
+					onPress={() => {
+						this.props.handlers.removeMarkerAtPosition(this.props.i);
 					}}
 				>
 					<Icon name="close" size={32} color="red" />
-				</View>
-				<View
-					onTouchEnd={() => {
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					onPress={() => {
 						this.props.navigation.navigate("MarkerEditScreen", {
-							data: { ...this.state.markers[this.state.i], routeId: this.props.routeId },
+							data: { ...marker, routeId: this.props.routeId },
 							callback: (data: IMarker) => {
 								let newMarker: IMarker = {
+									isLogicMarker: data.isLogicMarker,
+									logicFunction: data.logicFunction,
 									id: data.id,
 									types: data.types,
 									description: data.description,
@@ -254,143 +146,31 @@ export class Marker extends React.Component<Props, State> {
 									title: data.title,
 
 									day: data.day,
-									
 								};
 
-								let markers = [...this.state.markers.slice(0, this.state.i), newMarker, ...this.state.markers.slice(this.state.i + 1)].reduce((pv, cv) => (cv ? pv.concat(cv) : pv), []);
-								let markerElements = [...this.state.markerElements.slice(0, this.state.i), this, ...this.state.markerElements.slice(this.state.i + 1)].reduce((pv, cv) => (cv ? pv.concat(cv) : pv), []);
-
-								markerElements.forEach((m) => m.setState({ markers, markerElements }));
-								//this.setState({ markers, markerElements });
-								this.props.onMarkerUpdate(markers);
+								this.props.handlers.setMarkerAtPosition(newMarker, this.props.i);
 							},
 						});
 					}}
 				>
 					<Icon name="pencil" size={32} color="#242424"></Icon>
-				</View>
+				</TouchableOpacity>
 
 				<View style={{ width: 60, height: 60, alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-					{this.state.i > 0 && (
+					{this.props.i > 0 && (
 						<TouchableOpacity
 							onPress={() => {
-								let ni = this.state.i - 1;
-								console.table({ ni });
-								if (ni < 0) return;
-
-								let _still = this.state.markers.slice(0, ni);
-								let _toMove = this.state.markers[ni];
-								let _end = this.state.markers.slice(this.state.i + 1, this.state.markers.length);
-
-								let still = this.state.markerElements.slice(0, ni);
-								let toMove = this.state.markerElements[ni];
-								let end = this.state.markerElements.slice(this.state.i + 1, this.state.markerElements.length);
-
-								let markers = [..._still, this.state.markers[this.state.i], _toMove, ..._end];
-								let markerElements = [...still, this.state.markerElements[this.state.i], toMove, ...end];
-
-								still.forEach((m) => {
-									if (m)
-										m.setState({
-											markers: markers,
-											markerElements: markerElements,
-										});
-								});
-
-								end.forEach((m) => {
-									if (m)
-										m.setState({
-											markers: markers,
-											markerElements: markerElements,
-										});
-								});
-
-								toMove.setState({
-									top: toMove.state.top + 80,
-									i: toMove.state.i + 1,
-									markers: markers,
-									markerElements: markerElements,
-								});
-
-								this.setState({
-									markers: markers,
-									markerElements: markerElements,
-									i: ni,
-									top: ni * 80,
-								});
-
-								this.props.onMarkerUpdate(markers);
-
-								this.props.map.MapView?.fitToCoordinates(
-									markers.slice(ni - 2 >= 0 ? ni - 2 : 0, ni + 3 < markers.length ? ni + 3 : markers.length).map((m) => m.pos),
-									{
-										animated: true,
-										edgePadding: { bottom: 40, top: 40, left: 40, right: 40 },
-									},
-								);
+								this.props.handlers.switchMarkers(this.props.i - 1, this.props.i);
 							}}
 						>
 							<Icon name="chevron-up" size={24} color="#242424"></Icon>
 						</TouchableOpacity>
 					)}
 
-					{this.state.i < this.state.markers.length - 1 && (
+					{this.props.i < this.props.markers.length - 1 && (
 						<TouchableOpacity
 							onPress={() => {
-								let ni = this.state.i + 1;
-
-								console.table({ ni });
-								if (ni > this.state.markers.length - 1) return;
-
-								let _still = this.state.markers.slice(0, this.state.i);
-								let _toMove = this.state.markers[ni];
-								let _end = this.state.markers.slice(ni + 1, this.state.markers.length);
-
-								let markers = [..._still, _toMove, this.state.markers[this.state.i], ..._end];
-
-								let still = this.state.markerElements.slice(0, this.state.i);
-								let toMove = this.state.markerElements[ni];
-								let end = this.state.markerElements.slice(ni + 1, this.state.markers.length);
-
-								let markerElements = [...still, toMove, this.state.markerElements[this.state.i], ...end];
-
-								still.forEach((m) => {
-									m.setState({
-										markers: markers,
-										markerElements: markerElements,
-									});
-								});
-
-								end.forEach((m) => {
-									m?.setState({
-										markers: markers,
-										markerElements: markerElements,
-									});
-								});
-
-								toMove.setState({
-									top: (toMove.state.i - 1) * 80,
-									i: toMove.state.i - 1,
-									markers: markers,
-									markerElements: markerElements,
-								});
-
-								this.setState({
-									markers: markers,
-									markerElements: markerElements,
-									i: ni,
-									top: ni * 80,
-								});
-
-								this.props.onMarkerUpdate(markers);
-
-								this.props.map.MapView?.fitToCoordinates(
-									markers.slice(ni - 2 >= 0 ? ni - 2 : 0, ni + 3 < markers.length ? ni + 3 : markers.length).map((m) => m.pos),
-									{
-										animated: true,
-										edgePadding: { bottom: 40, top: 40, left: 40, right: 40 },
-									},
-								);
+								this.props.handlers.switchMarkers(this.props.i + 1, this.props.i);
 							}}
 						>
 							<Icon name="chevron-down" size={24} color="#242424"></Icon>

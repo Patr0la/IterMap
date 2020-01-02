@@ -14,13 +14,11 @@ interface Props extends IProps {}
 interface State extends IRoute {
 	loaded: boolean;
 
-	updateTime?: number;
-
 	editing: "route" | "markers";
 
-	canRender: boolean;
-
 	fullscreen: boolean;
+
+	selectedDay: number;
 }
 
 export class EditRoute extends React.Component<Props, State> {
@@ -36,18 +34,57 @@ export class EditRoute extends React.Component<Props, State> {
 		this.state = {
 			loaded: false,
 			editing: "markers",
-
-			canRender: false,
-
 			fullscreen: false,
+			selectedDay: 1,
 		};
 
 		this.addMarker.bind(this);
 		this.onMarkerUpdate.bind(this);
 	}
 
+	handlers: IMarkerUpdateHandlers = {
+		addMarker: (marker) => {
+			this.setState({ markers: [...this.state.markers, marker] });
+		},
+		addMarkerAtDay: (marker, day) => {
+			// let done = false;
+			// let pos = this.state.markers.reduce((pv, { logicFunction, day }, i) => {
+			// 	if (done) return pv;
+			// 	if (logicFunction == "day" && i > this.props.i && day > marker.day) {
+			// 		done = true;
+			// 		return pv;
+			// 	}
+			// 	return pv;
+			// }, -1);
+
+			this.handlers.addMarker(marker);
+		},
+		addMarkerAtPosition: (marker, position) => {},
+		moveMarkers: (s, i, e) => {},
+		removeMarkerAtPosition: (position) => {
+			this.setState({
+				markers: [...this.state.markers.slice(0, position), ...this.state.markers.slice(position + 1, this.state.markers.length)],
+			});
+		},
+		setMarkerAtPosition: (marker, position) => {
+			this.setState({
+				markers: [...this.state.markers.slice(0, position), marker, ...this.state.markers.slice(position + 1, this.state.markers.length)],
+			});
+		},
+		switchMarkers: (i1, i2) => {
+			let markers = this.state.markers.slice();
+			let temp = markers[i2];
+			markers[i2] = markers[i1];
+			markers[i1] = temp;
+			this.setState({ markers });
+		},
+		onDaySelect: (selectedDay) => {
+			this.setState({ selectedDay });
+		},
+	};
+
 	public LoadRoute(id: string) {
-		fetch(`http://${config.host}/getRouteData?id=${id}`, {
+		fetch(`${config.host}/getRouteData?id=${id}`, {
 			method: "GET",
 			headers: {
 				Accept: "application/json",
@@ -69,11 +106,9 @@ export class EditRoute extends React.Component<Props, State> {
                     { pictures: [], pos: { latitude: 45.1, longitude: 14.8 }, title: "5" },
                 ];*/
 				this.setState({ ...route, loaded: true });
-				this.editMap.setState({ ...route });
-				this.markerList.setState({ markers: route.markers });
 				this.loaded = true;
 
-				fetch(`http://${config.host}/getRouteDirections?id=${id}`, {
+				fetch(`${config.host}/getRouteDirections?id=${id}`, {
 					method: "GET",
 					headers: {
 						Accept: "application/json",
@@ -90,19 +125,7 @@ export class EditRoute extends React.Component<Props, State> {
 
 	addMarker(pos: IPos, id?: string, name?: string) {
 		console.log(this);
-		this.onMarkerUpdate([
-			...this.state.markers,
-			{
-				pictures: [],
-				pos: pos,
-				title: name ?? "Untitled",
-				description: "",
-				price: { currency: "€", value: 0 },
-				time: "",
-				id: id ?? `marker_${new Date().getTime()}`,
-				types: [],
-			},
-		]);
+		this.onMarkerUpdate([...this.state.markers]);
 	}
 
 	onMarkerUpdate(markers: Array<IMarker>) {
@@ -116,7 +139,7 @@ export class EditRoute extends React.Component<Props, State> {
 
 	sync() {
 		console.log("Sync");
-		fetch(`http://${config.host}/setMarkersForRoute`, {
+		fetch(`${config.host}/setMarkersForRoute`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
@@ -128,7 +151,7 @@ export class EditRoute extends React.Component<Props, State> {
 				markers: this.state.markers,
 			}),
 		}).then((res) => {
-			fetch(`http://${config.host}/getRouteDirections?id=${this.state._id || this.props.navigation.getParam("id", "undefined")}`, {
+			fetch(`${config.host}/getRouteDirections?id=${this.state._id || this.props.navigation.getParam("id", "undefined")}`, {
 				method: "GET",
 				headers: {
 					Accept: "application/json",
@@ -139,7 +162,6 @@ export class EditRoute extends React.Component<Props, State> {
 				.then((res) => res.json())
 				.then((path: Array<IPos>) => {
 					this.setState({ path });
-					this.editMap.setState({ path });
 				});
 		});
 	}
@@ -191,7 +213,7 @@ export class EditRoute extends React.Component<Props, State> {
 					<View>
 						<TextInput style={styles.textInput} value={this.state.title} onChangeText={(title) => this.setState({ title })}></TextInput>
 					</View>
-				) : this.state.canRender ? (
+				) : (
 					<View style={{ width: "100%", height: "100%", flexDirection: "column" }}>
 						<View>
 							<SearchBox
@@ -223,26 +245,24 @@ export class EditRoute extends React.Component<Props, State> {
 						</View>
 
 						<View style={{ width: "100%", zIndex: this.state.fullscreen ? 0 : 10 }}>
-							<EditMap ref={(ref) => (this.editMap = ref)} addMarker={(pos, id, name) => this.addMarker(pos, id, name)} data={this.props.data}></EditMap>
+							<EditMap markers={this.state.markers} ref={(ref) => (this.editMap = ref)} handlers={this.handlers} data={this.props.data}></EditMap>
 						</View>
 
 						<MarkerList
+							selectedDay={this.state.selectedDay}
 							ref={(ref) => (this.markerList = ref)}
 							routeId={this.state._id}
-							onMarkerUpdate={(markers) => {
-								this.onMarkerUpdate(markers);
-							}}
+							handlers={this.handlers}
 							markers={this.state.markers}
 							Map={this.editMap}
 							data={this.props.data}
 							navigation={this.props.navigation}
-							fullscreenChange={(fullscreen) => {
+							onFullscreenChange={(fullscreen) => {
 								this.setState({ fullscreen });
 							}}
+							fullscreen={this.state.fullscreen}
 						></MarkerList>
 					</View>
-				) : (
-					<View onLayout={() => this.setState({ canRender: true })}></View>
 				)}
 			</View>
 		);

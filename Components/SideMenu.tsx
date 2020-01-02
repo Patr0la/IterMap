@@ -35,7 +35,7 @@ export class SideMenu extends React.Component<IProps, IState> {
         return (
             <View style={styles.container} onLayout={() => this.setState({loaded: true})}>
                 <View>
-                    <BetterImage parentViewStyle={styles.proifleImageParent} imageStyle={styles.profileImage} imageSource="web" url={`http://${config.host}/profilePic?u=${this.props.data}`} cacheImage data={this.props.data} navigation={this.props.navigation} >
+                    <BetterImage parentViewStyle={styles.proifleImageParent} imageStyle={styles.profileImage} imageSource="web" url={`${config.host}/profilePic?u=${this.props.data}`} cacheImage data={this.props.data} navigation={this.props.navigation} >
                         <Icon name="account" size={128} color="#aaaa"/>
                     </BetterImage>
 

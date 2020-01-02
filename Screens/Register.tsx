@@ -39,8 +39,8 @@ export class Register extends React.Component<Props, State> {
         if (this.state.licenseAccepted && this.state.passwordsMatch && this.state.password1 && this.state.username && this.state.email) {
             const password = sha.sha512(this.state.password1);
 
-            alert(`http://${config.host}/register`);
-            fetch(`http://${config.host}/register`, {
+            alert(`${config.host}/register`);
+            fetch(`${config.host}/register`, {
                 method: "POST",
                 headers: {
                     Accept: "application/json",
@@ -128,7 +128,7 @@ export class Register extends React.Component<Props, State> {
                     </Button>
                 </View>
                 <View style={{ flex: 1 }}></View>
-                <BetterImage cacheImage data={this.props.data} navigation={this.props.navigation} url={`http://${config.host}/banner2.png`} imageSource="web" parentViewStyle={{ height: 200, width: "100%", position: "absolute", top : d.height * 0.9 - 200}} imageStyle={{ flex: 1 }}></BetterImage>
+                <BetterImage cacheImage data={this.props.data} navigation={this.props.navigation} url={`${config.host}/banner2.png`} imageSource="web" parentViewStyle={{ height: 200, width: "100%", position: "absolute", top : d.height * 0.9 - 200}} imageStyle={{ flex: 1 }}></BetterImage>
                 
             </View>
         );

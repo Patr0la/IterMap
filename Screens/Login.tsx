@@ -31,7 +31,7 @@ export class Login extends React.Component<Props, State> {
         const password = sha.sha512(this.state.password);
 
         alert("logining in");
-        fetch(`http://${config.host}/login`, {
+        fetch(`${config.host}/login`, {
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -81,7 +81,7 @@ export class Login extends React.Component<Props, State> {
                     </View>
                 </View>
                 
-                <BetterImage cacheImage data={this.props.data} navigation={this.props.navigation} url={`http://${config.host}/banner.png`} imageSource="web" parentViewStyle={{ height: 200, width: "100%", position: "absolute", top : d.height * 0.9 - 200}} imageStyle={{ flex: 1 }}></BetterImage>
+                <BetterImage cacheImage data={this.props.data} navigation={this.props.navigation} url={`${config.host}/banner.png`} imageSource="web" parentViewStyle={{ height: 200, width: "100%", position: "absolute", top : d.height * 0.9 - 200}} imageStyle={{ flex: 1 }}></BetterImage>
                 <View style={{position: "absolute", height: d.height * 0.1, top: d.height * 0.9, width: "100%", backgroundColor: "#aaaaaa"}}></View>
             </View>
         );

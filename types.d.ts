@@ -1,142 +1,162 @@
 interface IProps {
-    navigation?: import("react-navigation-stack").NavigationStackProp | import("react-navigation-drawer").NavigationDrawerProp; //ScreenNavigation.IScreenNavigationData;
+	navigation?: import("react-navigation-stack").NavigationStackProp | import("react-navigation-drawer").NavigationDrawerProp; //ScreenNavigation.IScreenNavigationData;
 
-    data: IUserData;
+	data: IUserData;
 }
 
 interface IUserData {
-    username: string;
-    token: string;
-    lastLocation: ILastLocation;
-    lastPos: ILivePos;
+	username: string;
+	token: string;
+	lastLocation: ILastLocation;
+	lastPos: ILivePos;
+	online: boolean;
 
-    myRoutes: Array<IRoute>;
-    myProfileInfo: IProfileEntry;
-    liveRoutesInCreation: Array<{ id: string; name: string, tracking: boolean }>;
-    liveRoutesTracking: Array<{ id: string; name: string, tracking: boolean }>;
+	myRoutes: Array<IRoute>;
+	myProfileInfo: IProfileEntry;
+	liveRoutesInCreation: Array<{ id: string; name: string; tracking: boolean }>;
+	liveRoutesTracking: Array<{ id: string; name: string; tracking: boolean }>;
 
-    initilize(callback: () => void, locationCallback: () => void): void;
+	initilize(callback: () => void, locationCallback: () => void): void;
 
-    displayAngle: boolean;
-    flash: boolean;
-    cameraFront: boolean;
-    grid: boolean;
+	displayAngle: boolean;
+	flash: boolean;
+	cameraFront: boolean;
+	grid: boolean;
 
-    displayHeatMap: boolean;
-    displayMarkers: boolean;
-    displayPath: boolean;
-    displaySatelite: boolean;
+	displayHeatMap: boolean;
+	displayMarkers: boolean;
+	displayPath: boolean;
+	displaySatelite: boolean;
 }
 interface ILastLocation {
-    city: string;
-    county: string;
-    country: string;
-    pos: IPos;
+	city: string;
+	county: string;
+	country: string;
+	pos: IPos;
 }
 
 interface IRoute {
-    _id?: ObjectId & string;
+	_id?: ObjectId & string;
 
-    title?: string;
-    creator?: string;
-    created?: number;
+	title?: string;
+	creator?: string;
+	created?: number;
 
-    score?: number;
-    votes?: Array<IVote>;
-    views?: number;
-    uses?: number;
+	score?: number;
+	votes?: Array<IVote>;
+	views?: number;
+	uses?: number;
 
-    travelTime?: number;
-    cost?: number;
+	travelTime?: number;
+	cost?: number;
 
-    markers?: Array<IMarker>;
-    path?: Array<IPos>;
-    livePath?: Array<ILivePos>;
-    traveledBy?: Array<travelVehicle>;
+	markers?: Array<IMarker>;
+	path?: Array<IPos>;
+	livePath?: Array<ILivePos>;
+	traveledBy?: Array<travelVehicle>;
 
-    lastMapPosition?: IPos;
+	lastMapPosition?: IPos;
 
-    canEdit?: boolean;
+	canEdit?: boolean;
 }
 
 interface IVote {
-    user: string;
-    comment: string;
-    mark: number;
+	user: string;
+	comment: string;
+	mark: number;
 }
 
 interface ICityRoute extends IRoute {
-    city: string;
+	city: string;
 }
 
 interface ICountryRoute extends IRoute {
-    cities: Array<string>;
+	cities: Array<string>;
 
-    country: string;
+	country: string;
 }
 
 interface IInternationalRoute extends IRoute {
-    cities: Array<string>;
-    countries: Array<string>;
+	cities: Array<string>;
+	countries: Array<string>;
 }
 
 type travelVehicle = "Plane" | "Ship" | "Bus" | "Car" | "Foot";
 
 interface IMarker {
-    id: string;
+	id: string;
 
-    pos: IPos;
-    title?: string;
-    pictures?: Array<string>;
-    time: string;
-    price: ICost;
-    description: string;
+	isLogicMarker: boolean;
+	logicFunction: "day" | "waypoint" | "avoid" | "location";
 
-    types: Array<string>;
+	pos: IPos;
+	title?: string;
+	pictures?: Array<string>;
+	time: string;
+	price: ICost;
+	description: string;
 
-    day: number;
+	types: Array<string>;
 
-    _markerOnMap?: any;
+	day: number;
+
+	_markerOnMap?: any;
 }
 
 interface ICost {
-    value: number;
-    currency: string;
+	value: number;
+	currency: string;
 }
 
 interface IPos {
-    longitude: number;
-    latitude: number;
+	longitude: number;
+	latitude: number;
 }
 
 interface IProfileEntry {
-    username?: string;
+	username?: string;
 
-    routes?: Array<import("bson").ObjectID>;
+	routes?: Array<import("bson").ObjectID>;
 
-    score?: number;
+	score?: number;
 }
 
 interface ILiveRoute {
-    localId?: string;
+	localId?: string;
 
-    name?: string;
-    share?: boolean;
-    latency?: number;
-    latencyUnit?: "h" | "m";
+	name?: string;
+	share?: boolean;
+	latency?: number;
+	latencyUnit?: "h" | "m";
 
-    path?: Array<ILivePos>;
+	path?: Array<ILivePos>;
 
-    markers?: Array<IMarker>;
+	markers?: Array<IMarker>;
 }
 
 interface ILivePos extends IPos {
-    time: number;
-    latitude: number;
-    longitude: number;
-    altitude: number;
-    accuracy: number;
-    speed: number;
+	time: number;
+	latitude: number;
+	longitude: number;
+	altitude: number;
+	accuracy: number;
+	speed: number;
 }
 
-interface ObjectId { }
+interface IMarkerUpdateHandlers {
+	setMarkerAtPosition: (marker: IMarker, position: number) => void;
+
+	addMarker: (marker: IMarker) => void;
+	addMarkerAtDay: (marker: IMarker, day: number) => void;
+	addMarkerAtPosition: (marker: IMarker, position: number) => void;
+
+	removeMarkerAtPosition: (position: number) => void;
+
+	moveMarkers: (s: number, i: number, e: number) => void;
+    switchMarkers: (i1: number, i2: number) => void;
+    
+
+    onDaySelect: (day: number) => void;
+}
+
+interface ObjectId {}

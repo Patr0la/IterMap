@@ -35,7 +35,7 @@ export class UserData implements IUserData {
 
         Geolocation.getCurrentPosition(
             pos => {
-                fetch(`http://${config.host}/reverseGeoCode`, {
+                fetch(`${config.host}/reverseGeoCode`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json",
@@ -67,7 +67,7 @@ export class UserData implements IUserData {
 
     public reftesh(callback: (sucess: boolean) => void) {
         try {
-            fetch(`http://${config.host}/myProfileInfo`, {
+            fetch(`${config.host}/myProfileInfo`, {
                 method: "GET",
                 headers: {
                     Accept: "application/json",
