@@ -51,7 +51,7 @@ interface IRoute {
 	cost?: number;
 
 	markers?: Array<IMarker>;
-	path?: Array<IPos>;
+	path?: Array<Array<IPos>>;
 	livePath?: Array<ILivePos>;
 	traveledBy?: Array<travelVehicle>;
 
@@ -87,7 +87,7 @@ interface IMarker {
 	id: string;
 
 	isLogicMarker: boolean;
-	logicFunction: "day" | "waypoint" | "avoid" | "location";
+	logicFunction: "day" | "waypoint" | "location";
 
 	pos: IPos;
 	title?: string;

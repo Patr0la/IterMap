@@ -11,6 +11,8 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface Props extends IProps, IRoute {
 	handlers: IMarkerUpdateHandlers;
+
+	selectedDay: number;
 }
 
 interface State {
@@ -113,10 +115,26 @@ export class EditMap extends React.Component<Props, State> {
 					onMarkerPress={(e) => {
 						console.log(e);
 					}}
-					onLayout={(e) => (this.props.path?.length > 2 ? this.MapView.fitToCoordinates(this.props.path, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } }) : this.props.livePath?.length ? this.MapView.fitToCoordinates(this.props.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } }) : null)}
+					onLayout={(e) =>
+						this.props.path?.length > 2
+							? this.MapView.fitToCoordinates(
+									this.props.path.reduce((pv, p) => pv.concat(p), []),
+									{ animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } },
+							  )
+							: this.props.livePath?.length
+							? this.MapView.fitToCoordinates(this.props.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } })
+							: null
+					}
 				>
 					{this.markersOnMap}
-					{this.state && this.props.path && this.props.path.length > 1 && <Polyline coordinates={this.props.path} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
+					{/*this.state && this.props.path && this.props.path.length > 1 && this.props.path[this.props.selectedDay - 1].map((path) => (path.length > 0 ? <Polyline coordinates={path} strokeColor="#AD0A4C" strokeWidth={6}></Polyline> : null))*/}
+
+					{(() => {
+						console.log(this.props?.path?.[this.props.selectedDay - 1]);
+						return null;
+					})()}
+					{this.props?.path?.[this.props.selectedDay - 1]?.length > 1 && <Polyline coordinates={this.props.path[this.props.selectedDay - 1]} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
+
 					{this.state && this.props.livePath && this.props.livePath.length > 1 && <Polyline coordinates={this.props.livePath} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
 				</MapView>
 

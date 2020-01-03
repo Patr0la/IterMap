@@ -117,7 +117,8 @@ export class EditRoute extends React.Component<Props, State> {
 					},
 				})
 					.then((res) => res.json())
-					.then((path: Array<IPos>) => {
+					.then((path: Array<Array<IPos>>) => {
+						console.log(path)
 						this.setState({ path });
 					});
 			});
@@ -160,7 +161,8 @@ export class EditRoute extends React.Component<Props, State> {
 				},
 			})
 				.then((res) => res.json())
-				.then((path: Array<IPos>) => {
+				.then((path: Array<Array<IPos>>) => {
+					console.log(path)
 					this.setState({ path });
 				});
 		});
@@ -245,7 +247,7 @@ export class EditRoute extends React.Component<Props, State> {
 						</View>
 
 						<View style={{ width: "100%", zIndex: this.state.fullscreen ? 0 : 10 }}>
-							<EditMap markers={this.state.markers} ref={(ref) => (this.editMap = ref)} handlers={this.handlers} data={this.props.data}></EditMap>
+							<EditMap markers={this.state.markers} ref={(ref) => (this.editMap = ref)} handlers={this.handlers} data={this.props.data} path={this.state.path} selectedDay={this.state.selectedDay}></EditMap>
 						</View>
 
 						<MarkerList
