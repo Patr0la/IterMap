@@ -70,7 +70,7 @@ export class ImageTaken extends React.Component<Props, State> {
 			// TODO rest of props
 			this.setState({ imageData, location, timeTaken: new Date().getTime(), posTaken: { latitude: this.props.data.lastPos.latitude, longitude: this.props.data.lastPos.longitude, time: this.props.data.lastPos.time, accuracy: this.props.data.lastPos.accuracy, altitude: this.props.data.lastPos.altitude, speed: this.props.data.lastPos.speed } });
 			console.log("REEEEE1111");
-			fetch(`${config.host}/findPlacesNear`, {
+			fetch(`${config.host}/api/findPlacesNear`, {
 				method: "POST",
 				headers: {
 					Accept: "application/json",

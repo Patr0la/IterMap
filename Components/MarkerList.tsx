@@ -110,21 +110,19 @@ export class MarkerList extends React.Component<Props, State> {
 								onPress={() => {
 									let day = this.props.markers.reduce((pv, { logicFunction }) => (logicFunction == "day" ? pv + 1 : pv), 1);
 
-									this.props.handlers.addMarker(
-										{
-											logicFunction: "day",
-											isLogicMarker: true,
-											day,
-											description: "",
-											id: `day_${day}`,
-											pos: null,
-											price: null,
-											time: "",
-											types: [],
-											pictures: [],
-											title: `Day ${day}`,
-										}
-									);
+									this.props.handlers.addMarker({
+										logicFunction: "day",
+										isLogicMarker: true,
+										day,
+										description: "",
+										id: `day_${day}`,
+										pos: null,
+										price: null,
+										time: "",
+										types: [],
+										pictures: [],
+										title: `Day ${day}`,
+									});
 								}}
 							>
 								<Icon name="calendar-plus" color="#242424" size={32} />
@@ -133,7 +131,7 @@ export class MarkerList extends React.Component<Props, State> {
 
 							<TouchableOpacity
 								style={{ flexDirection: "column", alignItems: "center" }}
-								onPress={() => {
+								onPress={async () => {
 									this.props.handlers.addMarkerAtDay(
 										{
 											logicFunction: "waypoint",
@@ -141,7 +139,7 @@ export class MarkerList extends React.Component<Props, State> {
 											day: this.props.selectedDay,
 											description: "",
 											id: `waypoint_${new Date().getTime()}`,
-											pos: null,
+											pos: (await this.props.Map.MapView.getCamera()).center,
 											price: null,
 											time: "",
 											types: [],

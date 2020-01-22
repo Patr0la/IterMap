@@ -23,6 +23,7 @@ import { ImageTaken } from "./Screens/ImageTaken";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { Gallery } from "./Screens/GalleryScreen";
 
 /*
     let uri = { uri: "https://www.rspcasa.org.au/wp-content/uploads/2019/01/Adopt-a-cat-or-kitten-from-RSPCA.jpg" };
@@ -125,6 +126,10 @@ const MarkerEditScreen = (props) => {
 	return <EditMarker data={userData} navigation={props.navigation}></EditMarker>;
 };
 
+const GalleryScreen = (props) => {
+	return <Gallery data={userData} navigation={props.navigation}></Gallery>;
+};
+
 const RouteCreationStack = createStackNavigator({
 	CreateNewRoute: {
 		screen: CreateNewRouteScreen,
@@ -156,22 +161,44 @@ const ProfileStack = createStackNavigator({
 		navigationOptions: ({ navigation }) => ({
 			title: "Edit marker",
 			drawerLockMode: "locked-closed",
-			headerRight: () => {
+			headerLeft: () => {
 				return (
 					<Icon
-						
 						onPress={() => {
 							console.log(this);
 							console.log(navigation.getParam("data", {}));
 							navigation.getParam("callback", () => {})(navigation.getParam("data", {}));
 							navigation.goBack();
 						}}
-						name="check"
+						name="arrow-left"
 						size={30}
 					/>
 				);
-            },
-            headerRightContainerStyle: {marginRight: "5%"}
+			},
+			headerLeftContainerStyle: { marginLeft: "2.5%" },
+		}),
+	},
+	Gallery: {
+		screen: GalleryScreen,
+		navigationOptions: ({ navigation }) => ({
+			title: navigation.getParam("name", undefined) ? `Gallery for ${navigation.getParam("name")}` : "Gallery",
+			drawerLockMode: "locked-closed",
+
+			headerLeft: () => {
+				return (
+					<Icon
+						onPress={() => {
+							console.log(this);
+							console.log(navigation.getParam("data", {}));
+							navigation.getParam("callback", () => {})(navigation.getParam("data", {}));
+							navigation.goBack();
+						}}
+						name="arrow-left"
+						size={30}
+					/>
+				);
+			},
+			headerLeftContainerStyle: { marginLeft: "2.5%" },
 		}),
 	},
 });

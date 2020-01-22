@@ -23,7 +23,7 @@ export class CreateNewRoute extends React.Component<IProps, State> {
         AsyncStorage.getItem("token", (err, token) => {
             if (token) {
                 alert("Here====");
-                fetch(`${config.host}/newRoute`, {
+                fetch(`${config.host}/api/newRoute`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json",

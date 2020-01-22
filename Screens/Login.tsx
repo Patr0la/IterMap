@@ -31,7 +31,7 @@ export class Login extends React.Component<Props, State> {
         const password = sha.sha512(this.state.password);
 
         alert("logining in");
-        fetch(`${config.host}/login`, {
+        fetch(`${config.host}/api/login`, {
             method: "POST",
             headers: {
                 Accept: "application/json",

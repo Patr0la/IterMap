@@ -15,11 +15,6 @@ interface Props extends IProps {}
 
 interface State extends IMarker {
 	routeId: string;
-
-	mainPicSource: string;
-	mainPicStartLocation: { x: number; y: number };
-	mainPicRadius: number;
-	pictureSources: Array<string>;
 }
 
 export class EditMarker extends Component<Props, State> {
@@ -29,34 +24,66 @@ export class EditMarker extends Component<Props, State> {
 
 	componentDidMount() {
 		let data: IMarker = this.props.navigation.getParam("data", {});
-		console.log("DID MOUNT");
+		// console.log("DID MOUNT");
 		!this.props.navigation.getParam("update", false) && this.setState({ ...data });
 	}
 
 	componentDidUpdate() {
-		console.log("DID UPDATE");
+		// console.log("DID UPDATE");
 		JSON.stringify(this.props.navigation.getParam("data", {})) != JSON.stringify(this.state) && this.props.navigation.setParams({ data: { ...this.state }, update: true });
 	}
 
 	render() {
-		let mainPic = this.state?.pictures?.[0] ?? this.state?.mainPicSource;
+		// let mainPic = this.state?.pictures?.[0] ?? this.state?.mainPicSource;
 
 		return (
-			<View style={{ flexDirection: "column", justifyContent: "space-evenly", padding: "5%", width: "100%", height: "100%" }}>
+			<View style={{ flexDirection: "column", justifyContent: "flex-start", padding: "5%", paddingTop: "2.5%", width: "100%", height: "100%" }}>
 				<TextInput style={styles.textInput} value={this.state?.title} onChangeText={(title) => this.setState({ title })}></TextInput>
 
 				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
 					<Text style={{ width: "33%" }}>Time spent here:</Text>
-					<TextInput style={{ ...styles.textInput, width: "13%", marginTop: 0, marginHorizontal: "5%" }} value={this.state?.price?.value?.toString()} placeholder="Price" onChangeText={(cost) => this.setState({ price: { value: parseInt(cost), currency: "€" } })}></TextInput>
-					<Picker mode="dropdown" onValueChange={() => {}} selectedValue={"m"} style={{ width: "43%" }}>
+
+					<TextInput
+						keyboardType="numeric"
+						style={{ ...styles.textInput, width: "13%", marginTop: 0, marginHorizontal: "5%" }}
+						value={this.state?.time?.time?.toString()}
+						onChangeText={(time) => {
+							//@ts-ignore
+							this.setState({ time: { time: time.length > 0 ? (isNaN(parseInt(time)) ? this.state.time.time : parseInt(time)) : "", unit: this.state.time.unit } });
+						}}
+					></TextInput>
+					<Picker
+						mode="dropdown"
+						onValueChange={(unit) => {
+							this.setState({ time: { time: this.state.time?.time ?? 0, unit } });
+						}}
+						selectedValue={this.state?.time?.unit ?? "m"}
+						style={{ width: "43%" }}
+					>
 						<Picker.Item label="Minutes" value="m"></Picker.Item>
 						<Picker.Item label="Hours" value="h"></Picker.Item>
 					</Picker>
 				</View>
 				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
 					<Text style={{ width: "33%" }}>Cost:</Text>
-					<TextInput style={{ ...styles.textInput, width: "13%", marginTop: 0, marginHorizontal: "5%" }} value={this.state?.price?.value?.toString()} placeholder="Price" onChangeText={(cost) => this.setState({ price: { value: parseInt(cost), currency: "€" } })}></TextInput>
-					<Picker mode="dropdown" onValueChange={() => {}} selectedValue={"Local"} style={{ width: "43%" }}>
+
+					<TextInput
+						keyboardType="numeric"
+						style={{ ...styles.textInput, width: "13%", marginTop: 0, marginHorizontal: "5%" }}
+						value={this.state?.price?.value?.toString()}
+						onChangeText={(cost) => {
+							//@ts-ignore
+							this.setState({ price: { value: cost.length > 0 ? (isNaN(parseInt(cost)) ? this.state.price.value : parseInt(cost)) : "", currency: this.state?.price?.currency ?? "Local" } });
+						}}
+					></TextInput>
+					<Picker
+						mode="dropdown"
+						onValueChange={(currency) => {
+							this.setState({ price: { value: this.state.price.value, currency } });
+						}}
+						selectedValue={this.state?.price?.currency ?? "Local"}
+						style={{ width: "43%" }}
+					>
 						<Picker.Item label="€" value="€"></Picker.Item>
 						<Picker.Item label="$" value="$"></Picker.Item>
 						<Picker.Item label="£" value="£"></Picker.Item>
@@ -64,58 +91,66 @@ export class EditMarker extends Component<Props, State> {
 					</Picker>
 				</View>
 
-				<View style={{ flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }}>
-					<Text>Day: </Text>
-					<TextInput
-						style={{ ...styles.textInput, width: "5%", marginTop: 0 }}
-						value={this.state?.price?.value?.toString()}
-						placeholder="Price"
-						onChangeText={(cost) => {
-							this.setState({ price: { value: parseInt(cost), currency: "€" } });
+				<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly", marginTop: "10%" }}>
+					<TouchableOpacity
+						onPress={() => {
+							this.props.navigation.navigate("Gallery", {
+								callback: (pictures) => {
+									console.log(pictures);
+									this.setState({ pictures: pictures.images });
+								},
+								data: {
+									images: [...this.state.pictures],
+									routeId: this.state.routeId,
+									markerId: this.state.id,
+								},
+							});
 						}}
-					></TextInput>
+					>
+						<Icon style={{}} name="image-multiple" size={48} />
+						<Text>View Gallery </Text>
+					</TouchableOpacity>
 				</View>
-
-				<View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
+				{/*<View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between" }}>
 					{mainPic ? (
-						<BetterImage url={`${config.host}/routeImages?route=${this.state.routeId}&image=${mainPic}`} imageSource="web" cacheImage={false} imageStyle={{ width: "100%", height: "100%", borderRadius: 32 }} parentViewStyle={{ width: 64, height: 64, marginTop: 10, marginLeft: 20 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>
+						<BetterImage url={this.state.mainPicSource ? this.state.mainPicSource : `${config.host}/api/routeImages?route=${this.state.routeId}&image=${mainPic}`} imageSource="web" cacheImage={false} imageStyle={{ width: "100%", height: "100%", borderRadius: 32 }} parentViewStyle={{ width: 64, height: 64, marginTop: 10, marginLeft: 20 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>
 					) : (
 						<TouchableOpacity
 							onPress={() => {
 								ImagePicker.openPicker({
 									multiple: false,
 									mediaType: "photo",
-									includeBase64: false,
+									includeBase64: true,
 								})
-									.then((res: Image[]) => {
+									.then((res: Image) => {
 										console.log(res);
 
-										this.setState({ mainPicSource: res[0].path });
+										this.setState({ mainPicSource: res.path });
 
 										// console.log(res)
 										// this.setState({ mainPicSource: res[0]. }); // TODO image check, mini width etc..
 
-										// fetch(`${config.host}/uploadMarkerPicture`, {
-										// 	method: "POST",
-										// 	headers: {
-										// 		Accept: "application/json",
-										// 		"Content-Type": "application/json",
-										// 		Cookie: `session=${this.props.data.token}`,
-										// 	},
-										// 	body: JSON.stringify({
-										// 		image: res.data,
-										// 		routeId: this.state.routeId,
-										// 	}),
-										// })
-										// 	.then((res) => res.json())
-										// 	.then((res) => {
-										// 		console.log(res);
+										fetch(`${config.host}/api/uploadMarkerPicture`, {
+											method: "POST",
+											headers: {
+												Accept: "application/json",
+												"Content-Type": "application/json",
+												Cookie: `session=${this.props.data.token}`,
+											},
+											body: JSON.stringify({
+												image: res.data,
+												routeId: this.state.routeId,
+											}),
+										})
+											.then((res) => res.json())
+											.then((res) => {
+												console.log(res);
 
-										// 		this.setState({ pictures: [res.id, ...this.state.pictures.slice(1)] });
-										// 	})
-										// 	.catch((err) => {
-										// 		console.log(err);
-										// 	});
+												this.setState({ pictures: [res.id, ...this.state.pictures.slice(1)] });
+											})
+											.catch((err) => {
+												console.log(err);
+											});
 									})
 									.catch((error) => {
 										console.log(error);
@@ -145,7 +180,7 @@ export class EditMarker extends Component<Props, State> {
 									// console.log(res)
 									// this.setState({ mainPicSource: res[0]. }); // TODO image check, mini width etc..
 
-									// fetch(`${config.host}/uploadMarkerPicture`, {
+									// fetch(`${config.host}/api/uploadMarkerPicture`, {
 									// 	method: "POST",
 									// 	headers: {
 									// 		Accept: "application/json",
@@ -178,7 +213,7 @@ export class EditMarker extends Component<Props, State> {
 							<Text style={{ color: "#242424" }}>Add other images</Text>
 						</View>
 					</TouchableOpacity>
-				</View>
+					</View>*/}
 
 				<TextInput style={{ ...styles.textInput, height: 100, marginTop: 0 }} multiline value={this.state?.description} placeholder="Description..." onChangeText={(description) => this.setState({ description })}></TextInput>
 			</View>

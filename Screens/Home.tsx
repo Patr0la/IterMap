@@ -49,7 +49,7 @@ export class Home extends React.Component<Props, State> {
 
 		Geolocation.getCurrentPosition(
 			(pos) => {
-				fetch(`${config.host}/reverseGeoCode`, {
+				fetch(`${config.host}/api/reverseGeoCode`, {
 					method: "POST",
 					headers: {
 						Accept: "application/json",

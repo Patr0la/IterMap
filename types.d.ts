@@ -92,7 +92,7 @@ interface IMarker {
 	pos: IPos;
 	title?: string;
 	pictures?: Array<string>;
-	time: string;
+	time: ITime;
 	price: ICost;
 	description: string;
 
@@ -101,6 +101,11 @@ interface IMarker {
 	day: number;
 
 	_markerOnMap?: any;
+}
+
+interface ITime {
+	time: number;
+	unit: "m" | "h";
 }
 
 interface ICost {
@@ -144,19 +149,18 @@ interface ILivePos extends IPos {
 }
 
 interface IMarkerUpdateHandlers {
-	setMarkerAtPosition: (marker: IMarker, position: number) => void;
+	setMarkerAtPosition: (marker: IMarker, position: number, important?: boolean) => void;
 
-	addMarker: (marker: IMarker) => void;
-	addMarkerAtDay: (marker: IMarker, day: number) => void;
-	addMarkerAtPosition: (marker: IMarker, position: number) => void;
+	addMarker: (marker: IMarker, important?: boolean) => void;
+	addMarkerAtDay: (marker: IMarker, day: number, important?: boolean) => void;
+	addMarkerAtPosition: (marker: IMarker, position: number, important?: boolean) => void;
 
-	removeMarkerAtPosition: (position: number) => void;
+	removeMarkerAtPosition: (position: number, important?: boolean) => void;
 
-	moveMarkers: (s: number, i: number, e: number) => void;
-    switchMarkers: (i1: number, i2: number) => void;
-    
+	moveMarkers: (s: number, i: number, e: number, important?: boolean) => void;
+	switchMarkers: (i1: number, i2: number, important?: boolean) => void;
 
-    onDaySelect: (day: number) => void;
+	onDaySelect: (day: number, important?: boolean) => void;
 }
 
 interface ObjectId {}

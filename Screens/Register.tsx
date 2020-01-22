@@ -39,8 +39,8 @@ export class Register extends React.Component<Props, State> {
         if (this.state.licenseAccepted && this.state.passwordsMatch && this.state.password1 && this.state.username && this.state.email) {
             const password = sha.sha512(this.state.password1);
 
-            alert(`${config.host}/register`);
-            fetch(`${config.host}/register`, {
+            alert(`${config.host}/api/register`);
+            fetch(`${config.host}/api/register`, {
                 method: "POST",
                 headers: {
                     Accept: "application/json",

@@ -53,7 +53,7 @@ export class Search extends React.Component<Props, State> {
             return;
         }
 
-        fetch(`${config.host}/${this.props.endpoint}`, {
+        fetch(`${config.host}/api/${this.props.endpoint}`, {
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -89,7 +89,7 @@ export class Search extends React.Component<Props, State> {
                             console.log(this.props.endpoint);
 
                             if (this.props.endpoint == "findLocation")
-                                fetch(`${config.host}/findLocationGetLocationData`, {
+                                fetch(`${config.host}/api/findLocationGetLocationData`, {
                                     method: "POST",
                                     headers: {
                                         Accept: "application/json",

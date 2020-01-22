@@ -1,6 +1,6 @@
 import React from "react";
 import { EditMap } from "./EditMap";
-import { PanResponderInstance, Dimensions, PanResponder, ScrollView, View, Text, StyleSheet, Platform, ProgressViewIOSComponent } from "react-native";
+import { PanResponderInstance, Dimensions, PanResponder, ScrollView, View, Text, StyleSheet, Platform, ProgressViewIOSComponent, Image } from "react-native";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -42,31 +42,78 @@ export class Marker extends React.Component<Props, State> {
 	render() {
 		let marker = this.props.markers[this.props.i];
 		if (marker.isLogicMarker) {
+			if (marker.logicFunction == "day")
+				return (
+					<View
+						style={{ ...styles.marker, top: this.props.top, justifyContent: "center" }}
+						onTouchEnd={() => {
+							this.props.handlers.onDaySelect(marker.day);
+							let done = false;
+							let cords = this.props.markers.reduce((pv, { logicFunction, day, pos }, i) => {
+								if (done) return pv;
+								if (logicFunction == "day" && i > this.props.i && day > marker.day) {
+									done = true;
+									return pv;
+								}
+								if (i > this.props.i && pos) {
+									return pv.concat(pos);
+								}
+								return pv;
+							}, []);
+
+							cords?.length > 0 && this.props.map.MapView.fitToCoordinates(cords, { animated: true, edgePadding: { bottom: 20, top: 100, left: 50, right: 50 } });
+						}}
+					>
+						<Text style={{ marginHorizontal: "5%" }}>{marker.title}</Text>
+						<View style={{ flex: 1, height: 2, backgroundColor: this.props.selectedDay == marker.day ? "#ad0a4c" : "#242424", marginRight: marker.day > 1 ? 0 : 16 }} />
+
+						{marker.day != 1 && (
+							<TouchableOpacity
+								onPress={() => {
+									this.props.handlers.removeMarkerAtPosition(this.props.i);
+								}}
+							>
+								<Icon name="close" size={32} color="red" />
+							</TouchableOpacity>
+						)}
+
+						{marker.day > 1 && (
+							<View style={{ width: 60, height: 60, alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+								{this.props.i > 0 && (
+									<TouchableOpacity
+										onPress={() => {
+											this.props.handlers.switchMarkers(this.props.i - 1, this.props.i);
+										}}
+									>
+										<Icon name="chevron-up" size={24} color="#242424"></Icon>
+									</TouchableOpacity>
+								)}
+
+								{this.props.i < this.props.markers.length - 1 && (
+									<TouchableOpacity
+										onPress={() => {
+											this.props.handlers.switchMarkers(this.props.i + 1, this.props.i);
+										}}
+									>
+										<Icon name="chevron-down" size={24} color="#242424"></Icon>
+									</TouchableOpacity>
+								)}
+							</View>
+						)}
+					</View>
+				);
+
 			return (
 				<View
 					style={{ ...styles.marker, top: this.props.top, justifyContent: "center" }}
 					onTouchEnd={() => {
-						this.props.handlers.onDaySelect(marker.day);
-						let done = false;
-						let cords = this.props.markers.reduce((pv, { logicFunction, day, pos }, i) => {
-							if (done) return pv;
-							if (logicFunction == "day" && i > this.props.i && day > marker.day) {
-								done = true;
-								return pv;
-							}
-							if (i > this.props.i && pos) {
-								return pv.concat(pos);
-							}
-							return pv;
-						}, []);
-
-						cords?.length > 0 && this.props.map.MapView.fitToCoordinates(cords, { animated: true, edgePadding: { bottom: 20, top: 100, left: 50, right: 50 } });
+						this.props.map.MapView.animateCamera({ center: marker.pos });
 					}}
 				>
 					<Text style={{ marginHorizontal: "5%" }}>{marker.title}</Text>
-					<View style={{ flex: 1, height: 2, backgroundColor: this.props.selectedDay == marker.day ? "#ad0a4c" : "#242424", marginRight: marker.day > 1 ? 0 : 16 }} />
+					<View style={{ flex: 1, height: 2, backgroundColor: "#242424", marginRight: marker.day > 1 ? 0 : 16 }} />
 
-					{marker.day != 1 && (
+					{
 						<TouchableOpacity
 							onPress={() => {
 								this.props.handlers.removeMarkerAtPosition(this.props.i);
@@ -74,9 +121,9 @@ export class Marker extends React.Component<Props, State> {
 						>
 							<Icon name="close" size={32} color="red" />
 						</TouchableOpacity>
-					)}
+					}
 
-					{marker.day > 1 && (
+					{
 						<View style={{ width: 60, height: 60, alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
 							{this.props.i > 0 && (
 								<TouchableOpacity
@@ -98,7 +145,7 @@ export class Marker extends React.Component<Props, State> {
 								</TouchableOpacity>
 							)}
 						</View>
-					)}
+					}
 				</View>
 			);
 		}
@@ -106,15 +153,16 @@ export class Marker extends React.Component<Props, State> {
 		return (
 			<View
 				onTouchEnd={(e) => {
-					e.nativeEvent.pageX < d.width - 90 && this.props.map.MapView?.animateCamera({ center: marker.pos });
+					e.nativeEvent.pageX < d.width - 90 && this.props.map?.MapView?.animateCamera({ center: marker.pos });
 				}}
 				// {...this._panResponder.panHandlers} // TODO prebaciti se na slider, trenutačno previše glitcha
 				style={{ ...styles.marker, top: this.props.top }}
 			>
-				{marker.pictures[0] && <BetterImage url={`${config.host}/routeImages?route=${this.props.routeId}&image=${marker.pictures[0]}`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>}
+				{marker?.pictures?.[0] && <Image source={{ uri: `${config.host}/api/routeImages?route=${this.props.routeId}&image=${marker.pictures[0]}&form=cover` }} style={{ width: 42, height: 42, borderRadius: 21 }}></Image>}
+				{/*<BetterImage url={`${config.host}/api/routeImages?route=${this.props.routeId}&image=${marker?.pictures?.[0]}&form=cover`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>*/}
 				<Text
 					onPress={() => {
-						this.props.map.MapView?.animateCamera({ center: marker.pos });
+						this.props.map?.MapView?.animateCamera({ center: marker.pos });
 					}}
 					style={{ flexGrow: 10, marginLeft: 6, color: "#242424" }}
 				>
@@ -127,12 +175,13 @@ export class Marker extends React.Component<Props, State> {
 				>
 					<Icon name="close" size={32} color="red" />
 				</TouchableOpacity>
-
 				<TouchableOpacity
 					onPress={() => {
 						this.props.navigation.navigate("MarkerEditScreen", {
 							data: { ...marker, routeId: this.props.routeId },
 							callback: (data: IMarker) => {
+								console.log(data);
+
 								let newMarker: IMarker = {
 									isLogicMarker: data.isLogicMarker,
 									logicFunction: data.logicFunction,
@@ -148,14 +197,13 @@ export class Marker extends React.Component<Props, State> {
 									day: data.day,
 								};
 
-								this.props.handlers.setMarkerAtPosition(newMarker, this.props.i);
+								this.props.handlers.setMarkerAtPosition(newMarker, this.props.i, true);
 							},
 						});
 					}}
 				>
 					<Icon name="pencil" size={32} color="#242424"></Icon>
 				</TouchableOpacity>
-
 				<View style={{ width: 60, height: 60, alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
 					{this.props.i > 0 && (
 						<TouchableOpacity
@@ -177,7 +225,6 @@ export class Marker extends React.Component<Props, State> {
 						</TouchableOpacity>
 					)}
 				</View>
-
 				{
 					/*<View style={{ width: 60, height: 60, alignItems: "center", justifyContent: "center" }}>
 					<Text style={{ justifyContent: "center", alignItems: "center", alignSelf: "center" }}>

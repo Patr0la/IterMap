@@ -1,13 +1,18 @@
 import React from "react";
 import { EditMap } from "../Components/EditMap";
 import { MarkerList } from "../Components/MarkerList";
-import { View, Button, TextInput, StyleSheet, Text, Dimensions, StatusBarIOS, StatusBar } from "react-native";
+import { View, Button, TextInput, StyleSheet, Text, Dimensions, StatusBarIOS, StatusBar, Image } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import * as config from "../Config.json";
 import { SearchBox } from "../Components/SearchBox";
+import { PageNavigator } from "../Components/PageNavigator";
+
+import ImagePicker, { Image as CropImage } from "react-native-image-crop-picker";
+import RNFetchBlob from "rn-fetch-blob";
+import ProgressBar from "react-native-progress/Bar";
 
 interface Props extends IProps {}
 
@@ -19,6 +24,9 @@ interface State extends IRoute {
 	fullscreen: boolean;
 
 	selectedDay: number;
+
+	uploadProgress: number;
+	uploading: boolean;
 }
 
 export class EditRoute extends React.Component<Props, State> {
@@ -33,9 +41,12 @@ export class EditRoute extends React.Component<Props, State> {
 
 		this.state = {
 			loaded: false,
-			editing: "markers",
+			editing: "route",
 			fullscreen: false,
 			selectedDay: 1,
+
+			uploadProgress: 0,
+			uploading: false,
 		};
 
 		this.addMarker.bind(this);
@@ -45,31 +56,54 @@ export class EditRoute extends React.Component<Props, State> {
 	handlers: IMarkerUpdateHandlers = {
 		addMarker: (marker) => {
 			this.setState({ markers: [...this.state.markers, marker] });
-		},
-		addMarkerAtDay: (marker, day) => {
-			// let done = false;
-			// let pos = this.state.markers.reduce((pv, { logicFunction, day }, i) => {
-			// 	if (done) return pv;
-			// 	if (logicFunction == "day" && i > this.props.i && day > marker.day) {
-			// 		done = true;
-			// 		return pv;
-			// 	}
-			// 	return pv;
-			// }, -1);
 
-			this.handlers.addMarker(marker);
+			this.synced = false;
 		},
-		addMarkerAtPosition: (marker, position) => {},
-		moveMarkers: (s, i, e) => {},
+		addMarkerAtDay: (marker, dayToSet) => {
+			let done = false;
+			let pos = this.state.markers.reduce((pv, { logicFunction, day }, i) => {
+				if (done) return pv;
+
+				if (logicFunction == "day" && day > dayToSet) {
+					done = true;
+					return pv;
+				}
+
+				return i;
+			}, -1);
+
+			if (pos > 0) this.handlers.addMarkerAtPosition(marker, pos);
+			else this.handlers.addMarker(marker);
+		},
+		addMarkerAtPosition: (marker, position) => {
+			this.setState({ markers: [...this.state.markers.slice(0, position + 1), marker, ...this.state.markers.slice(position + 1, this.state.markers.length)] });
+
+			this.synced = false;
+		},
+		moveMarkers: (s, i, e) => {
+			this.synced = false;
+		},
 		removeMarkerAtPosition: (position) => {
 			this.setState({
 				markers: [...this.state.markers.slice(0, position), ...this.state.markers.slice(position + 1, this.state.markers.length)],
 			});
+
+			this.synced = false;
 		},
-		setMarkerAtPosition: (marker, position) => {
-			this.setState({
-				markers: [...this.state.markers.slice(0, position), marker, ...this.state.markers.slice(position + 1, this.state.markers.length)],
-			});
+		setMarkerAtPosition: (marker, position, important?: boolean) => {
+			this.setState(
+				{
+					markers: [...this.state.markers.slice(0, position), marker, ...this.state.markers.slice(position + 1, this.state.markers.length)],
+				},
+				() => {
+					if (important) {
+						console.log("IMPORTANT UPDATE");
+						this.sync();
+					}
+				},
+			);
+
+			this.synced = false;
 		},
 		switchMarkers: (i1, i2) => {
 			let markers = this.state.markers.slice();
@@ -77,14 +111,18 @@ export class EditRoute extends React.Component<Props, State> {
 			markers[i2] = markers[i1];
 			markers[i1] = temp;
 			this.setState({ markers });
+
+			this.synced = false;
 		},
 		onDaySelect: (selectedDay) => {
 			this.setState({ selectedDay });
+
+			this.synced = false;
 		},
 	};
 
 	public LoadRoute(id: string) {
-		fetch(`${config.host}/getRouteData?id=${id}`, {
+		fetch(`${config.host}/api/getRouteData?id=${id}`, {
 			method: "GET",
 			headers: {
 				Accept: "application/json",
@@ -106,9 +144,10 @@ export class EditRoute extends React.Component<Props, State> {
                     { pictures: [], pos: { latitude: 45.1, longitude: 14.8 }, title: "5" },
                 ];*/
 				this.setState({ ...route, loaded: true });
+				this.synced = true;
 				this.loaded = true;
 
-				fetch(`${config.host}/getRouteDirections?id=${id}`, {
+				fetch(`${config.host}/api/getRouteDirections?id=${id}`, {
 					method: "GET",
 					headers: {
 						Accept: "application/json",
@@ -118,7 +157,7 @@ export class EditRoute extends React.Component<Props, State> {
 				})
 					.then((res) => res.json())
 					.then((path: Array<Array<IPos>>) => {
-						console.log(path)
+						console.log(path);
 						this.setState({ path });
 					});
 			});
@@ -139,8 +178,10 @@ export class EditRoute extends React.Component<Props, State> {
 	synced: boolean = false;
 
 	sync() {
+		if (this.synced) return;
 		console.log("Sync");
-		fetch(`${config.host}/setMarkersForRoute`, {
+		this.synced = true;
+		fetch(`${config.host}/api/setMarkersForRoute`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
@@ -152,7 +193,7 @@ export class EditRoute extends React.Component<Props, State> {
 				markers: this.state.markers,
 			}),
 		}).then((res) => {
-			fetch(`${config.host}/getRouteDirections?id=${this.state._id || this.props.navigation.getParam("id", "undefined")}`, {
+			fetch(`${config.host}/api/getRouteDirections?id=${this.state._id || this.props.navigation.getParam("id", "undefined")}`, {
 				method: "GET",
 				headers: {
 					Accept: "application/json",
@@ -162,7 +203,7 @@ export class EditRoute extends React.Component<Props, State> {
 			})
 				.then((res) => res.json())
 				.then((path: Array<Array<IPos>>) => {
-					console.log(path)
+					console.log(path);
 					this.setState({ path });
 				});
 		});
@@ -171,8 +212,8 @@ export class EditRoute extends React.Component<Props, State> {
 	syncInterval: NodeJS.Timeout;
 	componentDidMount() {
 		this.syncInterval = setInterval(() => {
-			this.sync();
-		}, 5000);
+			if (!this.synced) this.sync();
+		}, 10000);
 	}
 
 	componentWillUnmount() {
@@ -190,30 +231,112 @@ export class EditRoute extends React.Component<Props, State> {
 
 		return (
 			<View>
-				<View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-					<TouchableOpacity
-						style={{
-							...styles.button,
-							...(this.state.editing == "route" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}),
-						}}
-						onPress={() => this.setState({ editing: "route" })}
-					>
-						<Text style={styles.buttonText}>Route</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={{ ...styles.button, ...(this.state.editing == "markers" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }}
-						onPress={() => {
-							this.setState({ editing: "markers" });
-							this.LoadRoute(this.state._id);
-						}}
-					>
-						<Text style={styles.buttonText}>Locations</Text>
-					</TouchableOpacity>
-				</View>
+				<PageNavigator
+					default="route"
+					routes={[
+						{ title: "Route", value: "route" },
+						{ title: "Locations", value: "markers" },
+					]}
+					onSelectionChange={(editing) => {
+						this.setState({ editing });
+					}}
+				/>
 
 				{this.state.editing == "route" ? (
-					<View>
-						<TextInput style={styles.textInput} value={this.state.title} onChangeText={(title) => this.setState({ title })}></TextInput>
+					<View style={{ padding: "5%", paddingTop: "2.5%" }}>
+						<TextInput
+							style={styles.textInput}
+							value={this.state.title}
+							onChangeText={(title) => {
+								this.setState({ title });
+								this.synced = false;
+							}}
+						></TextInput>
+
+						<View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-evenly"}}>
+							{this.state.uploading ? (
+								<View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.05 }}>
+									<ProgressBar progress={this.state.uploadProgress} width={d.width * 0.5} height={20} color="#ad0a4c" borderRadius={10} useNativeDriver={true}></ProgressBar>
+
+									<Text style={{ color: "#242424" }}>{Math.round(this.state.uploadProgress * 100)}%</Text>
+								</View>
+							) : this.state._id ? (
+								<View style={{flex: 1, width: "100%", marginTop: "10%"}}>
+								<Image
+								
+								resizeMethod="auto"
+								resizeMode="cover"
+								style={{flex: 1}}
+									source={{
+										uri: `${config.host}/api/routeImage?url=${this.state._id}`,
+										// headers: {
+										// 	Cookie: `session=${this.props.data.token}`,
+										// },
+										// method: "GET"
+									}}
+									
+									onError={(e) => console.log(e)}
+									onLoad={(e) => console.log("LOAD " + e.nativeEvent.source)}
+									
+								>
+									{(() => {
+										console.log(`${config.host}/api/routeImage?url=${this.state._id}`);
+										return null;
+									})()}
+								</Image>
+								</View>
+							) : null}
+							<TouchableOpacity
+								style={{ flexDirection: "column", alignItems: "center" }}
+								onPress={() => {
+									ImagePicker.openPicker({
+										multiple: false,
+										mediaType: "photo",
+										includeBase64: false,
+										includeExif: true,
+										compressImageQuality: 1,
+										writeTempFile: true,
+									}).then((res: CropImage) => {
+										let toUp = [
+											{ name: "routeId", data: this.state._id },
+											{ name: "any_name", filename: "any_filename.jpg", type: res.mime, data: `RNFetchBlob-${res.path}` },
+										];
+
+										console.table(toUp);
+
+										this.setState({ uploadProgress: 0, uploading: true });
+										RNFetchBlob.fetch(
+											"POST",
+											`${config.host}/api/uploadRouteImage`,
+											{
+												Cookie: `session=${this.props.data.token}`,
+												"Content-Type": "multipart/form-data",
+											},
+											toUp,
+										)
+											.uploadProgress({ interval: 100 }, (sent, total) => {
+												console.log(`${Math.round((sent / total) * 100)}%`);
+
+												this.setState({ uploadProgress: sent / total });
+											})
+											.then((res) => {
+												console.log(res);
+
+												let data = res.json();
+
+												this.setState({ uploading: false });
+											})
+											.catch((err) => {
+												this.setState({ uploading: false });
+												err && console.log(err);
+											});
+									});
+								}}
+							>
+								<Icon name="image" size={28} color="#242424" />
+								<Text>Upload route image</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
 				) : (
 					<View style={{ width: "100%", height: "100%", flexDirection: "column" }}>
@@ -247,7 +370,7 @@ export class EditRoute extends React.Component<Props, State> {
 						</View>
 
 						<View style={{ width: "100%", zIndex: this.state.fullscreen ? 0 : 10 }}>
-							<EditMap markers={this.state.markers} ref={(ref) => (this.editMap = ref)} handlers={this.handlers} data={this.props.data} path={this.state.path} selectedDay={this.state.selectedDay}></EditMap>
+							<EditMap routeId={this.state._id} markerList={this.markerList} markers={this.state.markers} ref={(ref) => (this.editMap = ref)} handlers={this.handlers} data={this.props.data} path={this.state.path} selectedDay={this.state.selectedDay}></EditMap>
 						</View>
 
 						<MarkerList
@@ -275,10 +398,8 @@ const d = Dimensions.get("screen");
 
 const styles = StyleSheet.create({
 	textInput: {
-		borderColor: "#aaaaaa",
-		borderWidth: 2,
-		marginLeft: 20,
-		marginRight: 20,
+		borderBottomColor: "#ad0a4c",
+		borderBottomWidth: 2,
 		marginTop: 10,
 	},
 	button: {

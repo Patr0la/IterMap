@@ -56,7 +56,9 @@ export class SearchBox extends React.Component<Props, State> {
 			return;
 		}
 
-		fetch(`${config.host}/${this.props.endpoint}`, {
+		if (querry.length % 3 != 0) return;
+
+		fetch(`${config.host}/api/${this.props.endpoint}`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
@@ -129,18 +131,19 @@ export class SearchBox extends React.Component<Props, State> {
 							width: d.width,
 							backgroundColor: "#323232",
 							display: this.state.active ? "flex" : "none",
+							flexDirection: "column",
 							// position: "absolute",
 							// zIndex: 10
 						}}
 					>
 						{this.state.resoults.map((r) => (
 							<TouchableOpacity
-								style={{ flexDirection: "row", justifyContent: "space-between", height: 30, alignItems: "center", alignContent: "center", marginLeft: "5%", marginRight: "5%", marginTop: "5%" }}
+								style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", alignContent: "center", marginLeft: "5%", marginRight: "5%", marginVertical: d.height * 0.025 }}
 								onPress={() => {
 									console.log(this.props.endpoint);
 
 									if (this.props.endpoint == "findLocation")
-										fetch(`${config.host}/findLocationGetLocationData`, {
+										fetch(`${config.host}/api/findLocationGetLocationData`, {
 											method: "POST",
 											headers: {
 												Accept: "application/json",
@@ -160,8 +163,15 @@ export class SearchBox extends React.Component<Props, State> {
 									Keyboard.dismiss();
 								}}
 							>
-								<Text style={{ color: "#aaaaaa" }}>{r.name}</Text>
-								{r.type && TypeToIcon[r.type] && <Icon name={TypeToIcon[r.type]} size={22} color="#aaaaaa" style={{ alignSelf: "center" }} />}
+								<Text style={{ color: "#aaaaaa", flex: 1 }}>{r.name}</Text>
+								{r.type && TypeToIcon[r.type] ? (
+									<Icon name={TypeToIcon[r.type]} size={22} color="#aaaaaa" style={{ alignSelf: "center" }} />
+								) : (
+									(() => {
+										console.table({ type: r.type, icon: TypeToIcon[r.type] });
+										return null;
+									})()
+								)}
 							</TouchableOpacity>
 						))}
 					</View>
@@ -212,6 +222,7 @@ export enum TypeToIcon {
 	pharmacy = "pharmacy",
 	police = "police-badge",
 	post_office = "mail",
+	food = "silverware",
 	restaurant = "silverware",
 	shoe_store = "shoe-formal",
 	shopping_mall = "shopping",

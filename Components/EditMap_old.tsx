@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Platform, StyleSheet, Dimensions, ImageBackground, Image } from "react-native";
+import { View, Platform, StyleSheet, Dimensions } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -8,19 +8,12 @@ import { BetterImage } from "./BetterImage";
 import * as config from "../Config.json";
 import { MapStyle } from "../MapStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { MarkerList } from "./MarkerList";
 
 interface Props extends IProps, IRoute {
-	routeId: string;
-
-	handlers: IMarkerUpdateHandlers;
-
-	selectedDay: number;
-
-	markerList: MarkerList;
+	addMarker: (pos: IPos, id?: string, name?: string) => void;
 }
 
-interface State {
+interface State extends IRoute {
 	displayHeatMap: boolean;
 	displayMarkers: boolean;
 	displayPath: boolean;
@@ -52,59 +45,20 @@ export class EditMap extends React.Component<Props, State> {
 
 	render() {
 		if (this.props.markers)
-			this.markersOnMap = this.props.markers.reduce((pv, { isLogicMarker, logicFunction, pos, pictures, title }, i) => {
-				if (isLogicMarker) {
-					if (logicFunction == "waypoint")
-						return pv.concat(
-							<Marker
-								draggable
-								onDragEnd={(e) => {
-									this.props.handlers.setMarkerAtPosition({ ...this.props.markers[i], pos: e.nativeEvent.coordinate }, i);
-								}}
-								coordinate={pos}
-								key={i}
-								onPress={() => {
-									this.props.markerList?.scrollView?.scrollTo({ y: i * 80 });
-								}}
-							>
-								<View style={{ width: 72, height: 72 }}>
-									<Icon name="map-marker" size={72} style={{ position: "absolute" /*marginTop: 5*/ }} color="#aaaaaa" />
-								</View>
-							</Marker>,
-						);
-					return pv;
-				}
-
-				return pv.concat(
-					<Marker
-						coordinate={pos}
-						key={i}
-						draggable={title.split("_")[0] == "marker"}
-						onDragEnd={(e) => {
-							this.props.handlers.setMarkerAtPosition({ ...this.props.markers[i], pos: e.nativeEvent.coordinate }, i);
-						}}
-						onPress={() => {
-							this.props.markerList?.scrollView?.scrollTo({ y: i * 80 });
-						}}
-					>
-						{pictures && pictures[0] ? (
-							<View style={{ width: 72, height: 72 }}>
-								<Icon name="map-marker" size={72} style={{ position: "absolute" /*marginTop: 5*/ }} color="#242424" />
-								<Image source={{ uri: `${config.host}/api/routeImages?route=${this.props.routeId}&image=${pictures[0]}&form=cover` }} style={{ width: 42, height: 42, borderRadius: 21, marginLeft: 15, marginTop: 8 }}></Image>
-							</View>
-						) : (
-							<View style={{ width: 72, height: 72 }}>
-								<Icon name="map-marker" size={72} style={{ position: "absolute" /*marginTop: 5*/ }} color="#242424" />
-							</View>
-						)}
-
-						{/*
-							
-							{<BetterImage  imageSource="web" cacheImage={false} imageStyle={{ width: 72, height: 72, borderRadius: 36 }} parentViewStyle={{ flex: 1 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>}
-					</View>*/}
-					</Marker>,
-				);
-			}, []);
+			this.markersOnMap = this.props.markers.reduce(
+				(pv, m, i) =>
+					!m.isLogicMarker
+						? pv.concat(
+								<Marker coordinate={m.pos} key={i}>
+									<View style={{ width: 56, height: 56 }}>
+										<Icon name="map-marker" size={56} style={{ position: "absolute" /*marginTop: 5*/ }} color="#242424" />
+										{m.pictures && m.pictures[0] && <BetterImage url={`${config.host}/api/routeImages?route=${this.state._id}&image=${m.pictures[0]}`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32, marginLeft: 12, marginTop: 6 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>}
+									</View>
+								</Marker>,
+						  )
+						: pv,
+				[],
+			);
 
 		// if (this.MapView && (this.state.path?.length > 2 || this.state.livePath?.length)) {
 		// 	this.MapView.fitToCoordinates(this.state.path?.length > 2 ? this.state.path : this.state.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } });
@@ -114,24 +68,7 @@ export class EditMap extends React.Component<Props, State> {
 			<View style={{ width: "100%", height: d.height / 2, zIndex: 1, padding: "5%", alignItems: "flex-end", flexDirection: "column", justifyContent: "space-between" }}>
 				<MapView
 					cacheEnabled
-					onPoiClick={(e) =>
-						this.props.handlers.addMarkerAtDay(
-							{
-								isLogicMarker: false,
-								logicFunction: "location",
-								pictures: [],
-								pos: e.nativeEvent.coordinate,
-								title: e.nativeEvent.name,
-								description: "",
-								price: { currency: "€", value: 0 },
-								time: "",
-								id: e.nativeEvent.placeId,
-								types: [],
-								day: this.props.markers.reduce((pv, { day }) => Math.max(pv, day), 0),
-							},
-							this.props.selectedDay,
-						)
-					}
+					onPoiClick={(e) => this.props.addMarker(e.nativeEvent.coordinate, e.nativeEvent.placeId, e.nativeEvent.name)}
 					ref={(ref) => (this.MapView = ref)}
 					//onLayout={() => this.props.onMapLayout()}
 					style={styles.map}
@@ -144,59 +81,17 @@ export class EditMap extends React.Component<Props, State> {
 					// 	latitudeDelta: 0.04,
 					// 	longitudeDelta: 0.02,
 					// }}
-					onLongPress={(e) => {
-						this.props.handlers.addMarkerAtDay(
-							{
-								isLogicMarker: true,
-								logicFunction: "waypoint",
-								pictures: [],
-								pos: e.nativeEvent.coordinate,
-								title: "Waypoint",
-								description: "",
-								price: null,
-								time: "",
-								id: `waypoint_${new Date().getTime()}`,
-								types: [],
-								day: this.props.markers.reduce((pv, { day }) => Math.max(pv, day), 0),
-							},
-							this.props.selectedDay,
-						);
-					}}
 					onPress={(e) => {
-						this.props.handlers.addMarker({
-							isLogicMarker: false,
-							logicFunction: "location",
-							pictures: [],
-							pos: e.nativeEvent.coordinate,
-							title: "Untitled",
-							description: "",
-							price: { currency: "€", value: 0 },
-							time: "",
-							id: `marker_${new Date().getTime()}`,
-							types: [],
-							day: this.props.markers.reduce((pv, { day }) => Math.max(pv, day), 0),
-						});
+						this.props.addMarker(e.nativeEvent.coordinate);
 					}}
 					onMarkerPress={(e) => {
 						console.log(e);
 					}}
-					onLayout={(e) =>
-						this.props.path?.length > 2
-							? this.MapView.fitToCoordinates(
-									this.props.path.reduce((pv, p) => pv.concat(p), []),
-									{ animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } },
-							  )
-							: this.props.livePath?.length
-							? this.MapView.fitToCoordinates(this.props.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } })
-							: null
-					}
+					onLayout={(e) => (this.state.path?.length > 2 ? this.MapView.fitToCoordinates(this.state.path, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } }) : this.state.livePath?.length ? this.MapView.fitToCoordinates(this.state.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } }) : null)}
 				>
-					{this.state.displayMarkers && this.markersOnMap}
-					{/*this.state && this.props.path && this.props.path.length > 1 && this.props.path[this.props.selectedDay - 1].map((path) => (path.length > 0 ? <Polyline coordinates={path} strokeColor="#AD0A4C" strokeWidth={6}></Polyline> : null))*/}
-
-					{this.props?.path?.[this.props.selectedDay - 1]?.length > 1 && <Polyline coordinates={this.props.path[this.props.selectedDay - 1]} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
-
-					{this.state && this.props.livePath && this.props.livePath.length > 1 && <Polyline coordinates={this.props.livePath} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
+					{this.markersOnMap}
+					{this.state && this.state.path && this.state.path.length > 1 && <Polyline coordinates={this.state.path} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
+					{this.state && this.state.livePath && this.state.livePath.length > 1 && <Polyline coordinates={this.state.livePath} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
 				</MapView>
 
 				<View style={{ flexDirection: "column", alignSelf: "flex-end", justifyContent: "center", alignItems: "center", ...(this.state.displayOptions ? { backgroundColor: "white", borderRadius: 5, elevation: 5 } : {}) }}>

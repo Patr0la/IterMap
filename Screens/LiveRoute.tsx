@@ -67,7 +67,7 @@ export class LiveRoute extends React.Component<Props, State> {
 		};
 	}
 
-	calculateRoutePoints(route: ILiveRoute) {
+	calculateRoutePoints(route: ILiveRoute): { path: any; markers: Array<IMarker> } {
 		let lastPoints = [];
 		let newPath = [];
 		let places = [];
@@ -76,20 +76,24 @@ export class LiveRoute extends React.Component<Props, State> {
 
 		console.log("Calculate root points");
 
+		let newMarkers: Array<IMarker> = [
+			...(route.markers ? route.markers : []),
+			...places.map(({ latitude, longitude, time }) => ({
+				pos: { latitude, longitude },
+				isLogicMarker: true,
+				logicFunction: "location" as const,
+				time,
+				price: { value: 0, currency: "" },
+				description: "",
+				types: [],
+				id: `${latitude},${longitude}`,
+				day: 0, // TODO calculate dateđ
+			})),
+		];
+
 		return {
 			path: newPath,
-			markers: [
-				...(route.markers ? route.markers : []),
-				...places.map(({ latitude, longitude, time }) => ({
-					pos: { latitude, longitude },
-					time,
-					price: { value: 0, currency: "" },
-					description: "",
-					types: [],
-					id: `${latitude},${longitude}`,
-					day: 0 // TODO calculate date
-				})),
-			],
+			markers: newMarkers,
 		};
 	}
 
@@ -169,22 +173,22 @@ export class LiveRoute extends React.Component<Props, State> {
 						<MapView
 							cacheEnabled
 							onPoiClick={(e) => {
-								this.setState({
-									markers: [
-										...this.state.markers,
-										{
-											pictures: [],
-											pos: e.nativeEvent.coordinate,
-											title: e.nativeEvent.name,
-											description: "",
-											price: { currency: "€", value: 0 },
-											time: "",
-											id: e.nativeEvent.placeId,
-											types: [],
-											day: 0
-										},
-									],
-								});
+								// this.setState({
+								// 	markers: [
+								// 		...this.state.markers,
+								// 		{
+								// 			pictures: [],
+								// 			pos: e.nativeEvent.coordinate,
+								// 			title: e.nativeEvent.name,
+								// 			description: "",
+								// 			price: { currency: "€", value: 0 },
+								// 			time: "",
+								// 			id: e.nativeEvent.placeId,
+								// 			types: [],
+								// 			day: 0,
+								// 		},
+								// 	],
+								// });
 							}}
 							ref={(ref) => (this.MapView = ref)}
 							//onLayout={() => this.props.onMapLayout()}
