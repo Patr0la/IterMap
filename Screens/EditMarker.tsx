@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, TextInput, Button, StyleSheet, Text, Picker } from "react-native";
+import { View, TextInput, Button, StyleSheet, Text, Picker, Dimensions } from "react-native";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { BetterImage } from "../Components/BetterImage";
@@ -10,6 +10,7 @@ import RNFetchBlob from "rn-fetch-blob";
 import * as config from "../Config.json";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { NavigationStackOptions } from "react-navigation-stack";
+import { CachableImage } from "../Components/CachableImage";
 
 interface Props extends IProps {}
 
@@ -91,7 +92,16 @@ export class EditMarker extends Component<Props, State> {
 					</Picker>
 				</View>
 
-				<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly", marginTop: "10%" }}>
+				<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly", marginTop: "10%"}}>
+					{this.state?.routeId && <CachableImage
+						source={{ uri: `${config.host}/api/routeImages?route=${this.state.routeId}&image=${this.state.pictures[0]}&form=cover`, headers: {} }}
+						imageProps={{
+							source: null,
+							style: { width: d.width * 0.25, height: d.width * 0.25 , borderRadius: 8 },
+						}}
+						data={this.props.data}
+					></CachableImage>}
+
 					<TouchableOpacity
 						onPress={() => {
 							this.props.navigation.navigate("Gallery", {
@@ -220,6 +230,8 @@ export class EditMarker extends Component<Props, State> {
 		);
 	}
 }
+
+const d = Dimensions.get("screen");
 
 const styles = StyleSheet.create({
 	textInput: {

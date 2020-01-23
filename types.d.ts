@@ -18,6 +18,8 @@ interface IUserData {
 
 	initilize(callback: () => void, locationCallback: () => void): void;
 
+	cache: ICache;
+
 	displayAngle: boolean;
 	flash: boolean;
 	cameraFront: boolean;
@@ -28,6 +30,18 @@ interface IUserData {
 	displayPath: boolean;
 	displaySatelite: boolean;
 }
+
+interface ICache {
+	cachedKeys: Array<{ value: string; lastUsed: number, maxAge: number, type: "image" | "json"}>;
+	cacheInitilized: boolean;
+	loadCache: (callback: () => void) => void;
+	checkIfCached: (key: string) => void;
+	getCachedValue: (key: string, callback: (error: any, value: string) => void) => void;
+	addToCache: (key: string, maxAge: number, type: "image" | "json") => void;
+	clearOldCache: (minAge: string) => void;
+	clearFromCache: (key: string) => void;
+}
+
 interface ILastLocation {
 	city: string;
 	county: string;

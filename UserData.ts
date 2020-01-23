@@ -6,6 +6,8 @@ import * as config from "./Config.json";
 
 import AsyncStorage from "@react-native-community/async-storage";
 
+import {Cache} from "./Cache"
+
 export class UserData implements IUserData {
 	private initilized = false;
 
@@ -18,6 +20,10 @@ export class UserData implements IUserData {
 		for (const v in DataKeys) {
 			keys.push(v);
 		}
+
+		this.cache = new Cache(() => {
+			console.log("Cache loaded")
+		});
 
 		AsyncStorage.multiGet(keys, (err, res) => {
 			if (err) {

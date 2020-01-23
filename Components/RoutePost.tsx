@@ -42,7 +42,7 @@ export class RoutePost extends React.Component<Props, State> {
 
 	render() {
 		return (
-			<View>
+			<View style={{marginTop: "10%"}}>
 				<View style={{ width: "100%", height: 4, backgroundColor: "#A4A4A4" }}></View>
 
 				<View style={styles.header}>
@@ -58,11 +58,22 @@ export class RoutePost extends React.Component<Props, State> {
 				<CachableImage
 					source={{
 						uri: `${config.host}/api/routeImage?id=${this.props._id}`,
+						headers: {},
 						//TODO get headers
 					}}
 					data={this.props.data}
+					imageProps={{
+						source: null,
+						resizeMethod: "auto",
+						resizeMode: "contain",
+						style: {
+							width: this.state.width,
+							height: this.state.height,
+							alignSelf: "stretch",
+						},
+					}}
 				></CachableImage>
-				{
+				{/*
 					<Image
 						source={{
 							uri: `${config.host}/api/routeImage?id=${this.props._id}`,
@@ -76,8 +87,7 @@ export class RoutePost extends React.Component<Props, State> {
 							alignSelf: "stretch",
 						}}
 						width={d.width} // height will be calculated automatically
-					></Image>
-				}
+					></Image>*/}
 
 				{/*<BetterImage imageSource="web" parentViewStyle={{ height: 360, width: "100%" }} imageStyle={styles.image} data={this.props.data} navigation={this.props.navigation} url={`${config.host}/api/routeImage?id=${this.props._id}`}></BetterImage>*/}
 

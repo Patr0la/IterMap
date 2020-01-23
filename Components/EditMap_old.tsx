@@ -8,6 +8,7 @@ import { BetterImage } from "./BetterImage";
 import * as config from "../Config.json";
 import { MapStyle } from "../MapStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { CachableImage } from "./CachableImage";
 
 interface Props extends IProps, IRoute {
 	addMarker: (pos: IPos, id?: string, name?: string) => void;
@@ -52,7 +53,20 @@ export class EditMap extends React.Component<Props, State> {
 								<Marker coordinate={m.pos} key={i}>
 									<View style={{ width: 56, height: 56 }}>
 										<Icon name="map-marker" size={56} style={{ position: "absolute" /*marginTop: 5*/ }} color="#242424" />
-										{m.pictures && m.pictures[0] && <BetterImage url={`${config.host}/api/routeImages?route=${this.state._id}&image=${m.pictures[0]}`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32, marginLeft: 12, marginTop: 6 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>}
+										{m.pictures && m.pictures[0] && (
+											<CachableImage
+												source={{
+													uri: `${config.host}/api/routeImages?route=${this.state._id}&image=${m.pictures[0]}`,
+													headers: {},
+													//TODO get headers
+												}}
+												imageProps={{
+													source: null,
+													style: { width: 32, height: 32, borderRadius: 16 },
+												}}
+												data={this.props.data}
+											></CachableImage>
+										)}
 									</View>
 								</Marker>,
 						  )

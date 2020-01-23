@@ -13,6 +13,7 @@ import { PageNavigator } from "../Components/PageNavigator";
 import ImagePicker, { Image as CropImage } from "react-native-image-crop-picker";
 import RNFetchBlob from "rn-fetch-blob";
 import ProgressBar from "react-native-progress/Bar";
+import { CachableImage } from "../Components/CachableImage";
 
 interface Props extends IProps {}
 
@@ -191,6 +192,7 @@ export class EditRoute extends React.Component<Props, State> {
 			body: JSON.stringify({
 				id: this.state._id,
 				markers: this.state.markers,
+				title: this.state.title
 			}),
 		}).then((res) => {
 			fetch(`${config.host}/api/getRouteDirections?id=${this.state._id || this.props.navigation.getParam("id", "undefined")}`, {
@@ -253,7 +255,7 @@ export class EditRoute extends React.Component<Props, State> {
 							}}
 						></TextInput>
 
-						<View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-evenly"}}>
+						<View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-evenly" }}>
 							{this.state.uploading ? (
 								<View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.05 }}>
 									<ProgressBar progress={this.state.uploadProgress} width={d.width * 0.5} height={20} color="#ad0a4c" borderRadius={10} useNativeDriver={true}></ProgressBar>
@@ -261,29 +263,25 @@ export class EditRoute extends React.Component<Props, State> {
 									<Text style={{ color: "#242424" }}>{Math.round(this.state.uploadProgress * 100)}%</Text>
 								</View>
 							) : this.state._id ? (
-								<View style={{flex: 1, width: "100%", marginTop: "10%"}}>
-								<Image
-								
-								resizeMethod="auto"
-								resizeMode="cover"
-								style={{flex: 1}}
-									source={{
-										uri: `${config.host}/api/routeImage?url=${this.state._id}`,
-										// headers: {
-										// 	Cookie: `session=${this.props.data.token}`,
-										// },
-										// method: "GET"
-									}}
-									
-									onError={(e) => console.log(e)}
-									onLoad={(e) => console.log("LOAD " + e.nativeEvent.source)}
-									
-								>
-									{(() => {
-										console.log(`${config.host}/api/routeImage?url=${this.state._id}`);
-										return null;
-									})()}
-								</Image>
+								<View style={{ flex: 1, width: "100%", marginTop: "10%" }}>
+									<CachableImage
+										source={{
+											uri: `${config.host}/api/routeImage?url=${this.state._id}`,
+											headers: {},
+											// TODO get headers
+											// headers: {
+											// 	Cookie: `session=${this.props.data.token}`,
+											// },
+											// method: "GET"
+										}}
+										imageProps={{
+											source: null,
+											resizeMethod: "auto",
+											resizeMode: "cover",
+											style: { width: d.height * 100, height: null, flex: 1},
+										}}
+										data={this.props.data}
+									></CachableImage>
 								</View>
 							) : null}
 							<TouchableOpacity

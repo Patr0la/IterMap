@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        backgroundColor: "#676767",
+        backgroundColor: "#242424",
     },
     title: {
         fontFamily: "DejaVuSerif-Bold",

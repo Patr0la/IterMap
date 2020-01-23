@@ -9,6 +9,7 @@ import * as config from "../Config.json";
 import { MapStyle } from "../MapStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { MarkerList } from "./MarkerList";
+import { CachableImage } from "./CachableImage";
 
 interface Props extends IProps, IRoute {
 	routeId: string;
@@ -90,7 +91,20 @@ export class EditMap extends React.Component<Props, State> {
 						{pictures && pictures[0] ? (
 							<View style={{ width: 72, height: 72 }}>
 								<Icon name="map-marker" size={72} style={{ position: "absolute" /*marginTop: 5*/ }} color="#242424" />
-								<Image source={{ uri: `${config.host}/api/routeImages?route=${this.props.routeId}&image=${pictures[0]}&form=cover` }} style={{ width: 42, height: 42, borderRadius: 21, marginLeft: 15, marginTop: 8 }}></Image>
+
+								<CachableImage
+									source={{
+										uri: `${config.host}/api/routeImages?route=${this.props.routeId}&image=${pictures[0]}&form=cover`,
+										headers: {
+											//TODO get headers
+										},
+									}}
+									imageProps={{
+										source: null,
+										style: { width: 42, height: 42, borderRadius: 21, marginLeft: 15, marginTop: 8 },
+									}}
+									data={this.props.data}
+								></CachableImage>
 							</View>
 						) : (
 							<View style={{ width: 72, height: 72 }}>

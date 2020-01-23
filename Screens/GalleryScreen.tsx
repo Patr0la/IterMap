@@ -100,7 +100,7 @@ export class Gallery extends Component<Props, State> {
 									</ImageBackground>
 								</TouchableOpacity>
 							))
-							.reduce((pv, cv, ci, arr) => (pv.length < arr.length ? arr.slice().concat(Array(4 - (arr.length % 4)).fill(<View key={`fill_${iKey++}`} style={{ width: d.width * 0.25, height: d.width * 0.25 }}></View>)) : pv), []);
+							.reduce((pv, cv, ci, arr) => (pv.length < arr.length ? arr.slice().concat(Array(4 - (arr.length % 4)).fill(<View key={`fill_${++iKey}`} style={{ width: d.width * 0.25, height: d.width * 0.25 }}></View>)) : pv), []);
 						return images;
 					})()}
 					<View style={{ height: d.height * 0.3, width: d.width }}></View>

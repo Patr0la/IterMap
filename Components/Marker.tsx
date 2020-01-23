@@ -8,6 +8,7 @@ import { BetterImage } from "./BetterImage";
 
 import * as config from "../Config.json";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { CachableImage } from "./CachableImage";
 
 interface Props extends IProps {
 	routeId: string;
@@ -158,7 +159,16 @@ export class Marker extends React.Component<Props, State> {
 				// {...this._panResponder.panHandlers} // TODO prebaciti se na slider, trenutačno previše glitcha
 				style={{ ...styles.marker, top: this.props.top }}
 			>
-				{marker?.pictures?.[0] && <Image source={{ uri: `${config.host}/api/routeImages?route=${this.props.routeId}&image=${marker.pictures[0]}&form=cover` }} style={{ width: 42, height: 42, borderRadius: 21 }}></Image>}
+				{marker?.pictures?.[0] && (
+					<CachableImage
+						source={{ uri: `${config.host}/api/routeImages?route=${this.props.routeId}&image=${marker.pictures[0]}&form=cover`, headers: {} }}
+						imageProps={{
+							source: null,
+							style: { width: 42, height: 42, borderRadius: 21 },
+						}}
+						data={this.props.data}
+					></CachableImage>
+				)}
 				{/*<BetterImage url={`${config.host}/api/routeImages?route=${this.props.routeId}&image=${marker?.pictures?.[0]}&form=cover`} imageSource="web" cacheImage={false} imageStyle={{ width: 32, height: 32, borderRadius: 16 }} parentViewStyle={{ width: 32, height: 32 }} data={this.props.data} navigation={this.props.navigation}></BetterImage>*/}
 				<Text
 					onPress={() => {
