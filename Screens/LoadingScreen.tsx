@@ -1,63 +1,55 @@
 import React from "react";
-import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, Dimensions } from "react-native";
-import { DataKeys } from "../UserData";
-
-import * as config from "../Config.json";
-
-import { AnimatedSVGPath } from 'react-native-svg-animations';
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { LoadingElement } from "../Components/LoadingElement";
 
-interface State { }
+interface State {}
 
 export class LoadingScreen extends React.Component<IProps, State> {
-    constructor(props: IProps) {
-        super(props);
+	constructor(props: IProps) {
+		super(props);
 
-        let canNavigateToHome = false;
-        let goneHome = false;
-        props.data.initilize(
-            () => {
-                if (props.data.token) {
-                    setTimeout(() => {
-                        console.log("reeee")
-                        props.navigation.navigate("Home");
-                    }, 1000)
-                    console.log("UGH")
-                    
-                    goneHome = true;
-                } else {
-                    props.navigation.navigate("Login");
-                }
-            },
-            () => {
-                console.log("Loaction setup")
-            }
-        );
-    }
+		let canNavigateToHome = false;
+		let goneHome = false;
+		props.data.initilize(
+			() => {
+				if (props.data.token) {
+					setTimeout(() => {
+						console.log("reeee");
+						props.navigation.navigate("Home");
+					}, 1000);
+					console.log("UGH");
 
-    render() {
-        // return <View></View>
-        return (
-            <View style={styles.container}>
-                
-                <LoadingElement height={22} width={30} scale={3} animating={true} strokeColor="#ad0a4c" fill="#242424"></LoadingElement><Text style={{fontSize: 100, color: "#242424"}}>ter</Text>
-            </View>
-        );
-    }
+					goneHome = true;
+				} else {
+					props.navigation.navigate("Login");
+				}
+			},
+			() => {
+				console.log("Loaction setup");
+			},
+		);
+	}
+
+	render() {
+		// return <View></View>
+		return (
+			<View style={styles.container}>
+				<LoadingElement height={22} width={30} scale={3} animating={true} strokeColor="#ad0a4c" fill="#242424"></LoadingElement>
+				<Text style={{ fontSize: 100, color: "#242424" }}>ter</Text>
+			</View>
+		);
+	}
 }
 
 const d = Dimensions.get("screen");
 
-
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "white",
-        alignItems: "center",
-        justifyContent: "center",
-        height: d.height,
-        width: d.width,
-        flexDirection: "row",
-        
-
-    },
+	container: {
+		backgroundColor: "white",
+		alignItems: "center",
+		justifyContent: "center",
+		height: d.height,
+		width: d.width,
+		flexDirection: "row",
+	},
 });

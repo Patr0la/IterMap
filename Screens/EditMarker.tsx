@@ -1,16 +1,9 @@
 import React, { Component } from "react";
-import { View, TextInput, Button, StyleSheet, Text, Picker, Dimensions } from "react-native";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { BetterImage } from "../Components/BetterImage";
-
-import ImagePicker, { Image } from "react-native-image-crop-picker";
-import RNFetchBlob from "rn-fetch-blob";
-
-import * as config from "../Config.json";
+import { Dimensions, Picker, StyleSheet, Text, TextInput, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { NavigationStackOptions } from "react-navigation-stack";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { CachableImage } from "../Components/CachableImage";
+import * as config from "../Config.json";
 
 interface Props extends IProps {}
 

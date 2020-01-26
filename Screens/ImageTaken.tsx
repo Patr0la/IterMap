@@ -1,20 +1,14 @@
-import React from "react";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-import * as config from "../Config.json";
-import { View, ImageBackground, Text, StyleSheet, Dimensions, StatusBar, Image, KeyboardAvoidingView, Keyboard } from "react-native";
-import { TouchableOpacity, TextInput, ScrollView } from "react-native-gesture-handler";
-
-import Carousel from "react-native-snap-carousel";
-
-import { TypeToIcon } from "../Components/SearchBox";
-import RNFetchBlob from "rn-fetch-blob";
-
-import { SearchablePicker } from "../Components/SearchablePicker";
 import AsyncStorage from "@react-native-community/async-storage";
-
 import CameraRoll from "@react-native-community/cameraroll";
+import React from "react";
+import { Dimensions, Image, ImageBackground, Keyboard, StatusBar, StyleSheet, Text, View } from "react-native";
+import { ScrollView, TextInput, TouchableOpacity } from "react-native-gesture-handler";
+import Carousel from "react-native-snap-carousel";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import RNFetchBlob from "rn-fetch-blob";
+import { SearchablePicker } from "../Components/SearchablePicker";
+import { TypeToIcon } from "../Components/SearchBox";
+import * as config from "../Config.json";
 
 interface Props extends IProps {}
 
@@ -224,12 +218,12 @@ export class ImageTaken extends React.Component<Props, State> {
 															route.markers.push({
 																id: this.state.selectedPlace,
 																isLogicMarker: false,
-                                                                logicFunction: "location",
-                                                                day: -1,
+																logicFunction: "location",
+																day: -1,
 																description: "",
 																pos: this.state.selectedPlacePos,
 																price: { value: 0, currency: "?" },
-																time: this.state.timeTaken.toString(),
+																time: {time: this.state.timeTaken, unit: "live"},
 																pictures: [`${writeTime}.jpg`],
 																title: this.state.customName,
 																types: [this.state.customType],
@@ -241,12 +235,12 @@ export class ImageTaken extends React.Component<Props, State> {
 														route.markers.push({
 															id: `custom_${writeTime}`,
 															isLogicMarker: false,
-                                                            logicFunction: "location",
-                                                            day: -1,
+															logicFunction: "location",
+															day: -1,
 															description: "",
 															pos: this.state.selectedPlacePos,
 															price: { value: 0, currency: "?" },
-															time: this.state.timeTaken.toString(),
+															time: {time: this.state.timeTaken, unit: "live"},
 															pictures: [`${writeTime}.jpg`],
 															title: this.state.customName,
 															types: [this.state.customType],
@@ -254,13 +248,13 @@ export class ImageTaken extends React.Component<Props, State> {
 													} else {
 														route.markers.push({
 															isLogicMarker: false,
-                                                            logicFunction: "location",
-                                                            day: -1,
+															logicFunction: "location",
+															day: -1,
 															id: `unknown_${new Date().getTime()}`,
 															description: "",
 															pos: this.state.posTaken,
 															price: { value: 0, currency: "?" },
-															time: this.state.timeTaken.toString(),
+															time: {time: this.state.timeTaken, unit: "live"},
 															pictures: [`${writeTime}.jpg`],
 															title: `Unknown ${(() => {
 																let custsomIds = [];

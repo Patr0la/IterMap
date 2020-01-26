@@ -1,10 +1,9 @@
-import React, { ReactNode } from "react";
-import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, CheckBox, Dimensions } from "react-native";
-
-import * as config from "../Config.json";
-import { BetterImage } from "../Components/BetterImage";
+import React from "react";
+import { AsyncStorage, Button, Dimensions, Text, TextInput, View } from "react-native";
 import { Switch } from "react-native-gesture-handler";
 import { CachableImage } from "../Components/CachableImage";
+import * as config from "../Config.json";
+
 //import { DataKeys } from "../Helper";
 const sha = require("../sha");
 
@@ -118,7 +117,7 @@ export class Register extends React.Component<Props, State> {
 					<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholderTextColor="#242424" placeholder="E-mail" onChangeText={(email) => this.setState({ email })}></TextInput>
 					<View style={{ width: "100%", flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }}>
 						<Text>I accept license aggreement:</Text>
-						<Switch style={{ margin: "5%" }} thumbColor="#aaaaaa" trackColor={{ false: "#242424", true: "#ad0a4c" }} onValueChange={(licenseAccepted) => this.setState({ licenseAccepted })} value={this.state.licenseAccepted}></Switch>
+						<Switch style={{ margin: "5%" }} thumbColor="#242424" trackColor={{ false: "#aaaaaa", true: "#ad0a4c" }} onValueChange={(licenseAccepted) => this.setState({ licenseAccepted })} value={this.state.licenseAccepted}></Switch>
 					</View>
 				</View>
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%", alignContent: "center", alignItems: "center" }}>

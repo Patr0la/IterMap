@@ -1,10 +1,9 @@
 import React from "react";
-import { Platform, Dimensions, StyleSheet, ScrollView, View, Text } from "react-native";
-import { Marker } from "./Marker";
-import { EditMap } from "./EditMap";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Dimensions, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { EditMap } from "./EditMap";
+import { Marker } from "./Marker";
 
 interface Props extends IProps {
 	Map: EditMap;
@@ -118,7 +117,7 @@ export class MarkerList extends React.Component<Props, State> {
 										id: `day_${day}`,
 										pos: null,
 										price: null,
-										time: "",
+										time: {time: 0, unit: "m"},
 										types: [],
 										pictures: [],
 										title: `Day ${day}`,
@@ -141,7 +140,7 @@ export class MarkerList extends React.Component<Props, State> {
 											id: `waypoint_${new Date().getTime()}`,
 											pos: (await this.props.Map.MapView.getCamera()).center,
 											price: null,
-											time: "",
+											time: {time: 0, unit: "m"},
 											types: [],
 											pictures: [],
 											title: `Waypoint`,

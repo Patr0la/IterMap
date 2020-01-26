@@ -1,14 +1,10 @@
 import React from "react";
-import { EditMap } from "./EditMap";
-import { PanResponderInstance, Dimensions, PanResponder, ScrollView, View, Text, StyleSheet, Platform, ProgressViewIOSComponent, Image } from "react-native";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-import { BetterImage } from "./BetterImage";
-
-import * as config from "../Config.json";
+import { Dimensions, PanResponderInstance, Platform, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import * as config from "../Config.json";
 import { CachableImage } from "./CachableImage";
+import { EditMap } from "./EditMap";
 
 interface Props extends IProps {
 	routeId: string;

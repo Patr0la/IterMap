@@ -1,18 +1,17 @@
 import React from "react";
+import { Dimensions, StyleSheet, Text, TextInput, View, ActivityIndicator } from "react-native";
+import { TouchableOpacity, Switch } from "react-native-gesture-handler";
+import ImagePicker, { Image as CropImage } from "react-native-image-crop-picker";
+import ProgressBar from "react-native-progress/Bar";
+import Progress from "react-native-progress";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import RNFetchBlob from "rn-fetch-blob";
+import { AutoHeightImage } from "../Components/AutoHeightImage";
 import { EditMap } from "../Components/EditMap";
 import { MarkerList } from "../Components/MarkerList";
-import { View, Button, TextInput, StyleSheet, Text, Dimensions, StatusBarIOS, StatusBar, Image } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-import * as config from "../Config.json";
-import { SearchBox } from "../Components/SearchBox";
 import { PageNavigator } from "../Components/PageNavigator";
-
-import ImagePicker, { Image as CropImage } from "react-native-image-crop-picker";
-import RNFetchBlob from "rn-fetch-blob";
-import ProgressBar from "react-native-progress/Bar";
+import { SearchBox } from "../Components/SearchBox";
+import * as config from "../Config.json";
 import { CachableImage } from "../Components/CachableImage";
 
 interface Props extends IProps {}
@@ -28,6 +27,9 @@ interface State extends IRoute {
 
 	uploadProgress: number;
 	uploading: boolean;
+
+	deletingRoute: boolean;
+	deletingRouteInProgress: boolean;
 }
 
 export class EditRoute extends React.Component<Props, State> {
@@ -48,6 +50,9 @@ export class EditRoute extends React.Component<Props, State> {
 
 			uploadProgress: 0,
 			uploading: false,
+
+			deletingRoute: false,
+			deletingRouteInProgress: false,
 		};
 
 		this.addMarker.bind(this);
@@ -98,7 +103,6 @@ export class EditRoute extends React.Component<Props, State> {
 				},
 				() => {
 					if (important) {
-						console.log("IMPORTANT UPDATE");
 						this.sync();
 					}
 				},
@@ -158,7 +162,6 @@ export class EditRoute extends React.Component<Props, State> {
 				})
 					.then((res) => res.json())
 					.then((path: Array<Array<IPos>>) => {
-						console.log(path);
 						this.setState({ path });
 					});
 			});
@@ -172,7 +175,6 @@ export class EditRoute extends React.Component<Props, State> {
 	onMarkerUpdate(markers: Array<IMarker>) {
 		this.setState({ markers });
 
-		console.log("Marker update");
 		this.synced = false;
 	}
 
@@ -180,7 +182,6 @@ export class EditRoute extends React.Component<Props, State> {
 
 	sync() {
 		if (this.synced) return;
-		console.log("Sync");
 		this.synced = true;
 		fetch(`${config.host}/api/setMarkersForRoute`, {
 			method: "POST",
@@ -192,7 +193,7 @@ export class EditRoute extends React.Component<Props, State> {
 			body: JSON.stringify({
 				id: this.state._id,
 				markers: this.state.markers,
-				title: this.state.title
+				title: this.state.title,
 			}),
 		}).then((res) => {
 			fetch(`${config.host}/api/getRouteDirections?id=${this.state._id || this.props.navigation.getParam("id", "undefined")}`, {
@@ -255,7 +256,75 @@ export class EditRoute extends React.Component<Props, State> {
 							}}
 						></TextInput>
 
-						<View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-evenly" }}>
+						{this.state.deletingRoute ? (
+							this.state.deletingRouteInProgress ? (
+								<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.1, width: "100%" }}>
+									<ActivityIndicator color="#ad0a4c" animating={true} style={{ width: 50, height: 50 }}></ActivityIndicator>
+								</View>
+							) : (
+								<View style={{ flexDirection: "column", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.2 }}>
+									<Text>Are you sure you want to delete this route?</Text>
+									<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.1, width: "100%" }}>
+										<TouchableOpacity
+											style={{ alignItems: "center" }}
+											onPress={() => {
+												this.setState({ deletingRoute: true, deletingRouteInProgress: true });
+
+												fetch(`${config.host}/api/deleteRoute`, {
+													headers: {
+														Accept: "application/json",
+														Cookie: `session=${this.props.data.token}`,
+														"Content-Type": "application/json",
+													},
+													method: "POST",
+													body: JSON.stringify({ id: this.state._id }),
+												})
+													.then((res) => res.json())
+													.then((state) => {
+														console.table(state);
+														if (state?.sucess) {
+															this.props.navigation.setParams({ mandatoryRefresh: true });
+															this.props.navigation.goBack();
+														}
+													});
+											}}
+										>
+											<Icon name="delete" color="red" size={22} />
+											<Text>Delete</Text>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={{ alignItems: "center" }}
+											onPress={() => {
+												this.setState({ deletingRoute: false });
+											}}
+										>
+											<Icon name="close" color="#242424" size={22} />
+											<Text>Cancle</Text>
+										</TouchableOpacity>
+									</View>
+								</View>
+							)
+						) : (
+							<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.1 }}>
+								<View style={{ flex: 1, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
+									<Text>Is public: </Text>
+									<Switch value={this.state.isPublic} thumbColor="#242424" trackColor={{ false: "#aaaaaa", true: "#ad0a4c" }} onValueChange={(isPublic) => this.setState({ isPublic })}></Switch>
+								</View>
+								<View style={{ flex: 1, alignItems: "center", flexDirection: "column" }}>
+									<TouchableOpacity
+										style={{ alignItems: "center" }}
+										onPress={() => {
+											this.setState({ deletingRoute: true });
+										}}
+									>
+										<Icon name="delete" color="#242424" size={22} />
+										<Text>Delete route</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+						)}
+
+						<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
 							{this.state.uploading ? (
 								<View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.05 }}>
 									<ProgressBar progress={this.state.uploadProgress} width={d.width * 0.5} height={20} color="#ad0a4c" borderRadius={10} useNativeDriver={true}></ProgressBar>
@@ -263,10 +332,11 @@ export class EditRoute extends React.Component<Props, State> {
 									<Text style={{ color: "#242424" }}>{Math.round(this.state.uploadProgress * 100)}%</Text>
 								</View>
 							) : this.state._id ? (
-								<View style={{ flex: 1, width: "100%", marginTop: "10%" }}>
-									<CachableImage
+								<View style={{ flex: 1, width: "100%", marginTop: "10%", minHeight: 100 }}>
+									<AutoHeightImage
+										parent={this}
 										source={{
-											uri: `${config.host}/api/routeImage?url=${this.state._id}`,
+											uri: `${config.host}/api/routeImage?id=${this.state._id}`,
 											headers: {},
 											// TODO get headers
 											// headers: {
@@ -276,12 +346,15 @@ export class EditRoute extends React.Component<Props, State> {
 										}}
 										imageProps={{
 											source: null,
-											resizeMethod: "auto",
-											resizeMode: "cover",
-											style: { width: d.height * 100, height: null, flex: 1},
+											style: {
+												backgroundColor: "red",
+												display: "flex",
+											},
 										}}
+										width={d.width * 0.4}
 										data={this.props.data}
-									></CachableImage>
+										cantUpdateCuzOfImageCacheBug
+									></AutoHeightImage>
 								</View>
 							) : null}
 							<TouchableOpacity
@@ -292,15 +365,15 @@ export class EditRoute extends React.Component<Props, State> {
 										mediaType: "photo",
 										includeBase64: false,
 										includeExif: true,
-										compressImageQuality: 1,
+										compressImageQuality: 0.8,
+										compressImageMaxWidth: 2048,
+										compressImageMaxHeight: 1080,
 										writeTempFile: true,
 									}).then((res: CropImage) => {
 										let toUp = [
 											{ name: "routeId", data: this.state._id },
 											{ name: "any_name", filename: "any_filename.jpg", type: res.mime, data: `RNFetchBlob-${res.path}` },
 										];
-
-										console.table(toUp);
 
 										this.setState({ uploadProgress: 0, uploading: true });
 										RNFetchBlob.fetch(
@@ -313,16 +386,16 @@ export class EditRoute extends React.Component<Props, State> {
 											toUp,
 										)
 											.uploadProgress({ interval: 100 }, (sent, total) => {
-												console.log(`${Math.round((sent / total) * 100)}%`);
-
 												this.setState({ uploadProgress: sent / total });
 											})
 											.then((res) => {
-												console.log(res);
-
 												let data = res.json();
 
-												this.setState({ uploading: false });
+												this.setState({ uploadProgress: 1 });
+
+												setTimeout(() => {
+													this.setState({ uploading: false });
+												}, 1000);
 											})
 											.catch((err) => {
 												this.setState({ uploading: false });
@@ -348,20 +421,7 @@ export class EditRoute extends React.Component<Props, State> {
 									return { lat: center.latitude, lng: center.longitude };
 								}}
 								onSelectCallback={(selection) => {
-									console.table(selection);
-
-									// TODO Animate to region after it is fixed.
-									// console.table({ latitude, longitude, latitudeDelta: latitude - selection.southwest.latitude, longitudeDelta: longitude - selection.southwest.longitude })
-
-									//this.editMap.MapView.animateCamera({ center: { latitude: selection.latitude, longitude: selection.longitude } });
-
-									// this.setState({ canRender: false })
-									// console.log("Forced updates");
-									console.log(selection.viewport);
-									console.log("REEE");
 									this.editMap.MapView.animateToRegion({ ...selection.viewport, latitude: selection.viewport.latitude - selection.viewport.latitudeDelta / 2, longitude: selection.viewport.longitude - selection.viewport.longitudeDelta / 2 }, 1000);
-									// this.editMap.MapView.forceUpdate();
-									//[selection.northeast, selection.southwest], {animated: false, edgePadding: {bottom: 10, top: 10, left: 10, right: 10}});
 								}}
 								placeHolder="Search for places.."
 							/>

@@ -1,20 +1,11 @@
 import React, { Component } from "react";
-import { View, TextInput, Button, StyleSheet, Text, Picker, ImageBackground, Dimensions, Image as RImage, Platform } from "react-native";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { BetterImage } from "../Components/BetterImage";
-
+import { Dimensions, ImageBackground, Platform, StyleSheet, Text, View } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import ImagePicker, { Image } from "react-native-image-crop-picker";
-import RNFetchBlob from "rn-fetch-blob";
-
-import * as config from "../Config.json";
-import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
-import { NavigationStackOptions } from "react-navigation-stack";
-import AsyncStorage from "@react-native-community/async-storage";
-import CameraRoll from "@react-native-community/cameraroll";
-
 import ProgressBar from "react-native-progress/Bar";
-import Share from "react-native-share";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import RNFetchBlob from "rn-fetch-blob";
+import * as config from "../Config.json";
 
 interface Props extends IProps {}
 
@@ -108,13 +99,17 @@ export class Gallery extends Component<Props, State> {
 
 				{this.state.selectingPictures ? (
 					<View style={{ width: d.width, backgroundColor: "white", flexDirection: "row", justifyContent: "space-evenly", height: 85, position: "absolute", top: d.height - 160, alignItems: "flex-start" }}>
-						{this.state.selectedPictures.length == 1 && 
-							<TouchableOpacity style={{ flexDirection: "column", justifyContent: "center", alignItems: "center" }} onPress={() => {
-								this.setState({images: [this.state.selectedPictures[0], ...this.state.images.filter(p => p != this.state.selectedPictures[0])]})
-							}}>
-							<Icon name="map-marker" size={28} color="#242424" />
-							<Text style={{ alignContent: "center", textAlign: "center" }}>Set marker{"\n"}picture</Text>
-						</TouchableOpacity>}
+						{this.state.selectedPictures.length == 1 && (
+							<TouchableOpacity
+								style={{ flexDirection: "column", justifyContent: "center", alignItems: "center" }}
+								onPress={() => {
+									this.setState({ images: [this.state.selectedPictures[0], ...this.state.images.filter((p) => p != this.state.selectedPictures[0])] });
+								}}
+							>
+								<Icon name="map-marker" size={28} color="#242424" />
+								<Text style={{ alignContent: "center", textAlign: "center" }}>Set marker{"\n"}picture</Text>
+							</TouchableOpacity>
+						)}
 
 						{/*<TouchableOpacity
 							style={{ flexDirection: "column", justifyContent: "center", alignItems: "center" }}
@@ -215,8 +210,10 @@ export class Gallery extends Component<Props, State> {
 									multiple: true,
 									mediaType: "photo",
 									includeBase64: false,
-									includeExif: true,
-									compressImageQuality: 1,
+									includeExif: true,									
+									compressImageQuality: 0.8,
+									compressImageMaxWidth: 2048,
+									compressImageMaxHeight: 1080,
 									writeTempFile: true,
 								}).then((res: Image[]) => {
 									//@ts-ignore
@@ -249,7 +246,7 @@ export class Gallery extends Component<Props, State> {
 										},
 										toUp,
 									)
-										.uploadProgress({ interval : 100 }, (sent, total) => {
+										.uploadProgress({ interval: 100 }, (sent, total) => {
 											console.log(`${Math.round((sent / total) * 100)}%`);
 
 											this.setState({ uploadProgress: sent / total });

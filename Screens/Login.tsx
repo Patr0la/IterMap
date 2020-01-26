@@ -1,9 +1,7 @@
-import React, { ReactNode } from "react";
-import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, Keyboard, Dimensions } from "react-native";
-
-import * as config from "../Config.json";
-import { BetterImage } from "../Components/BetterImage";
+import React from "react";
+import { AsyncStorage, Button, Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
 import { CachableImage } from "../Components/CachableImage";
+import * as config from "../Config.json";
 
 const sha = require("../sha");
 
@@ -86,7 +84,7 @@ export class Login extends React.Component<Props, State> {
 					}}
 					data={this.props.data}
 					imageProps={{
-                        source: null,
+						source: null,
 						style: { flex: 1 },
 					}}
 				></CachableImage>

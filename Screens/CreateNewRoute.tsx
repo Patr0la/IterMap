@@ -1,6 +1,5 @@
 import React from "react";
-import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, Picker, PickerItem } from "react-native";
-
+import { AsyncStorage, Button, StyleSheet, Text, TextInput, View } from "react-native";
 import * as config from "../Config.json";
 
 interface State {

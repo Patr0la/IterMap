@@ -1,15 +1,12 @@
 import React from "react";
-import { View, Platform, StyleSheet, Dimensions, ImageBackground, Image } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
-
+import { Dimensions, Platform, StyleSheet, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { BetterImage } from "./BetterImage";
-
 import * as config from "../Config.json";
 import { MapStyle } from "../MapStyle";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { MarkerList } from "./MarkerList";
 import { CachableImage } from "./CachableImage";
+import { MarkerList } from "./MarkerList";
 
 interface Props extends IProps, IRoute {
 	routeId: string;
@@ -138,7 +135,7 @@ export class EditMap extends React.Component<Props, State> {
 								title: e.nativeEvent.name,
 								description: "",
 								price: { currency: "€", value: 0 },
-								time: "",
+								time: {time: 0, unit: "m"},
 								id: e.nativeEvent.placeId,
 								types: [],
 								day: this.props.markers.reduce((pv, { day }) => Math.max(pv, day), 0),
@@ -168,7 +165,7 @@ export class EditMap extends React.Component<Props, State> {
 								title: "Waypoint",
 								description: "",
 								price: null,
-								time: "",
+								time: {time: 0, unit: "m"},
 								id: `waypoint_${new Date().getTime()}`,
 								types: [],
 								day: this.props.markers.reduce((pv, { day }) => Math.max(pv, day), 0),
@@ -185,7 +182,7 @@ export class EditMap extends React.Component<Props, State> {
 							title: "Untitled",
 							description: "",
 							price: { currency: "€", value: 0 },
-							time: "",
+							time: {time: 0, unit: "m"},
 							id: `marker_${new Date().getTime()}`,
 							types: [],
 							day: this.props.markers.reduce((pv, { day }) => Math.max(pv, day), 0),

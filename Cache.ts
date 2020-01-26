@@ -38,6 +38,21 @@ export class Cache implements ICache {
 		});
 	}
 
+	public getLastModified(key: string, callback: (lastModified: number) => void): void {
+		if (this.checkIfCached(key)) {
+			RNFetchBlob.fs.stat(`${CACHE_DIR}/${key}`).then(
+				(res) => {
+					callback(parseInt(res.lastModified));
+				},
+				() => {
+					callback(null);
+				},
+			);
+		} else {
+			callback(null);
+		}
+	}
+
 	public checkIfCached(key: string) {
 		if (!this.cachedKeys) return false;
 
@@ -59,7 +74,12 @@ export class Cache implements ICache {
 
 	public addToCache(key: string, maxAge: number, type: "image" | "json") {
 		console.log("CTIME: " + Math.floor(new Date().getTime() / 1000.0));
-		if (this.checkIfCached(key)) return;
+		if (this.checkIfCached(key)) {
+			// let i = this.cachedKeys.findIndex(({ value }) => value == key);
+			// this.cachedKeys[i].lastUsed = Math.floor(new Date().getTime() / 1000);
+			return;
+		}
+		console.log("CACHED: " + key);
 		this.cachedKeys.push({ value: key, lastUsed: Math.floor(new Date().getTime() / 1000.0), maxAge, type });
 	}
 
@@ -73,7 +93,13 @@ export class Cache implements ICache {
 		}, []);
 	}
 
-	public clearFromCache(key: string) {}
+	public clearFromCache(key: string) {
+		let i = this.cachedKeys.findIndex(({ value }) => value == key);
+
+		this.cachedKeys.splice(i, 1);
+
+		RNFetchBlob.fs.unlink(`${CACHE_DIR}/${key}`);
+	}
 }
 
 export const MAX_AGE = {

@@ -1,13 +1,11 @@
 import React from "react";
-import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, Picker, PickerItem, ViewPropTypes, ActivityIndicator, ListViewBase, ListViewComponent, Dimensions } from "react-native";
-
-import * as config from "../Config.json";
-import { BetterImage } from "./BetterImage";
-import { TraveledBy } from "./TraveledBy";
-
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
+import * as config from "../Config.json";
+import { AutoHeightImage } from "./AutoHeightImage";
+import { TraveledBy } from "./TraveledBy";
 import { CachableImage } from "./CachableImage";
+
 interface Props extends IProps, IRoute {}
 
 interface State extends IRoute {
@@ -42,12 +40,12 @@ export class RoutePost extends React.Component<Props, State> {
 
 	render() {
 		return (
-			<View style={{marginTop: "10%"}}>
-				<View style={{ width: "100%", height: 4, backgroundColor: "#A4A4A4" }}></View>
-
+			<View style={{ backgroundColor: "#323232" }}>
 				<View style={styles.header}>
-					<Text style={styles.title}>{this.state.title}</Text>
-					<Text style={styles.madeBy}> : by {this.state.creator}</Text>
+					<View style={{ alignItems: "center", flexDirection: "row", alignContent: "center" }}>
+						<Text style={styles.title}>{this.state.title}</Text>
+						<Text style={styles.madeBy}> : by {this.state.creator}</Text>
+					</View>
 					{this.state.creator == this.props.data.username && (
 						<Text onPress={() => this.props.navigation.navigate("EditRoute", { id: this.state._id })} style={{ marginRight: 10 }}>
 							<Icon name="dots-vertical" size={24} color="white" />
@@ -55,24 +53,29 @@ export class RoutePost extends React.Component<Props, State> {
 					)}
 				</View>
 
-				<CachableImage
+				<AutoHeightImage
+					parent={this}
 					source={{
-						uri: `${config.host}/api/routeImage?id=${this.props._id}`,
+						uri: `${config.host}/api/routeImage?id=${this.state._id}`,
 						headers: {},
-						//TODO get headers
+						// TODO get headers
+						// headers: {
+						// 	Cookie: `session=${this.props.data.token}`,
+						// },
+						// method: "GET"
 					}}
-					data={this.props.data}
 					imageProps={{
 						source: null,
-						resizeMethod: "auto",
-						resizeMode: "contain",
 						style: {
-							width: this.state.width,
-							height: this.state.height,
-							alignSelf: "stretch",
+							backgroundColor: "red",
+							display: "flex",
 						},
 					}}
-				></CachableImage>
+					width={d.width}
+					data={this.props.data}
+					cantUpdateCuzOfImageCacheBug
+				></AutoHeightImage>
+
 				{/*
 					<Image
 						source={{
@@ -91,21 +94,19 @@ export class RoutePost extends React.Component<Props, State> {
 
 				{/*<BetterImage imageSource="web" parentViewStyle={{ height: 360, width: "100%" }} imageStyle={styles.image} data={this.props.data} navigation={this.props.navigation} url={`${config.host}/api/routeImage?id=${this.props._id}`}></BetterImage>*/}
 
-				<View style={{ width: "100%", height: 4, backgroundColor: "#242424" }}></View>
-
 				<View style={styles.info}>
-					<Text>
-						{this.state.score} <Icon name="star" size={24} />
+					<Text style={styles.text}>
+						{this.state.score} <Icon name="star" size={24} color="white" />
 					</Text>
-					<Text>
-						{this.state.uses} <Icon name="eye-outline" size={24} />
+					<Text style={styles.text}>
+						{this.state.uses} <Icon name="eye-outline" size={24} color="white" />
 					</Text>
-					<Text>
-						{this.state.travelTime} <Icon name="clock-outline" size={24} />
+					<Text style={styles.text}>
+						{this.state.travelTime} <Icon name="clock-outline" size={24} color="white" />
 					</Text>
-					<Text>
-						{this.state.cost} <Icon name="cash-multiple" size={24} />
-					</Text>
+					{this.state.cost ? <Text style={styles.text}>
+						{this.state.cost} <Icon name="cash-multiple" size={24} color="white" />
+					</Text> : null}
 
 					<TraveledBy traveledBy={this.state.traveledBy}> </TraveledBy>
 				</View>
@@ -123,20 +124,19 @@ const styles = StyleSheet.create({
 		flexDirection: "column",
 		width: "100%",
 		marginTop: "10%",
-		backgroundColor: "#676767",
+		backgroundColor: "#a4a4a4",
 	},
 	title: {
 		fontFamily: "DejaVuSerif-Bold",
-		fontSize: 24,
+		fontSize: 20,
 		color: "white",
 		marginLeft: 10,
 	},
 	madeBy: {
 		fontFamily: "DejaVuSerif",
 		color: "#aaaaaa",
-		fontSize: 18,
-		marginTop: 6,
-		flexGrow: 1,
+		fontSize: 14,
+		marginTop: 3,
 	},
 	image: {
 		//position: "absolute",
@@ -152,13 +152,21 @@ const styles = StyleSheet.create({
 		//position: "absolute",
 		justifyContent: "space-between",
 		flexDirection: "row",
+		minHeight: d.height * 0.05,
+		alignItems: "center",
 	},
 	info: {
 		display: "flex",
 		justifyContent: "space-between",
 		flexDirection: "row",
-		height: 100,
-		backgroundColor: "red",
+		alignItems: "center",
+		minHeight: d.height * 0.05,
+		backgroundColor: "#323232",
 		width: "100%",
+		color: "white",
+		paddingHorizontal: "2.5%",
+	},
+	text: {
+		color: "white",
 	},
 });

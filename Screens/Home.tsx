@@ -1,28 +1,14 @@
-import React, { ReactNode } from "react";
-import { Text, Button, View, Image, StyleSheet, PermissionsAndroid, Dimensions, TouchableOpacity, TextInput, StatusBar, PanResponderInstance } from "react-native";
-
-import Geolocation from "react-native-geolocation-service";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { SearchBox } from "../Components/SearchBox";
-import { RoutesPreview } from "../Components/RoutesPreview";
-
 import BackgroundGeolocation, { Location } from "@mauron85/react-native-background-geolocation";
-
 import AsyncStorage from "@react-native-community/async-storage";
-import { DataKeys, UserData } from "../UserData";
-import { ScrollView } from "react-native-gesture-handler";
+import ViewPager from "@react-native-community/viewpager";
+import React from "react";
+import { Dimensions, PanResponderInstance, PermissionsAndroid, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Geolocation from "react-native-geolocation-service";
+import { SearchBox } from "../Components/SearchBox";
+import * as config from "../Config.json";
+import { DataKeys } from "../UserData";
 import { Camera } from "./Camera";
 import { LiveRoute } from "./LiveRoute";
-
-import ViewPager from "@react-native-community/viewpager";
-
-import { AdMobBanner, PublisherBanner } from "react-native-admob";
-
-import RNFetchBlob from "rn-fetch-blob";
-
-import * as config from "../Config.json";
-import { LoadingElement } from "../Components/LoadingElement";
 
 interface Props extends IProps {}
 

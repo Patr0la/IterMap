@@ -1,24 +1,14 @@
-import React, { ReactNode } from "react";
-import { Text, Button, View, Image, StyleSheet, PermissionsAndroid, Dimensions, TouchableOpacity, TextInput, ImageBackground } from "react-native";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { SearchBox } from "../Components/SearchBox";
-import { RoutesPreview } from "../Components/RoutesPreview";
-
-import { PageNavigator } from "../Components/PageNavigator";
-import MapView, { PROVIDER_GOOGLE, Polyline, Marker, Circle, Heatmap } from "react-native-maps";
-import { MapStyle } from "../MapStyle";
 import AsyncStorage from "@react-native-community/async-storage";
-import { ScrollView } from "react-native-gesture-handler";
-
-import ViewPager from "@react-native-community/viewpager";
-
-import * as config from "../Config.json";
-import RNFetchBlob from "rn-fetch-blob";
-import { BetterImage } from "../Components/BetterImage";
-
-import Share from "react-native-share";
 import CameraRoll from "@react-native-community/cameraroll";
+import React from "react";
+import { Button, Dimensions, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import MapView, { Circle, Heatmap, Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
+import Share from "react-native-share";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import RNFetchBlob from "rn-fetch-blob";
+import { PageNavigator } from "../Components/PageNavigator";
+import { MapStyle } from "../MapStyle";
 import { DataKeys } from "../UserData";
 
 interface Props extends IProps {

@@ -1,31 +1,34 @@
 import React from "react";
-import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput } from "react-native";
+import { AsyncStorage, Button, StyleSheet, Text, View } from "react-native";
 
 interface Props {
-    navigate: (screen: string) => void;
+	navigate: (screen: string) => void;
 }
 
-interface State {};
-
+interface State {}
 
 export class Settings extends React.Component<Props, State> {
-    render() {
-        return(
-            <View style={styles.container}>
-                <Text>Are you sure you want to log out?</Text>
-                <Button title="logout" onPress={() => AsyncStorage.clear()}><Text>Continue</Text></Button>
-                <Button title="back" onPress={() => AsyncStorage.clear()}><Text>Cancle</Text></Button>
-            </View>
-        );
-    }
+	render() {
+		return (
+			<View style={styles.container}>
+				<Text>Are you sure you want to log out?</Text>
+				<Button title="logout" onPress={() => AsyncStorage.clear()}>
+					<Text>Continue</Text>
+				</Button>
+				<Button title="back" onPress={() => AsyncStorage.clear()}>
+					<Text>Cancle</Text>
+				</Button>
+			</View>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: "100%"
-    },
+	container: {
+		flex: 1,
+		backgroundColor: "#fff",
+		alignItems: "center",
+		justifyContent: "center",
+		height: "100%",
+	},
 });

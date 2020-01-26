@@ -1,10 +1,8 @@
 import React from "react";
-import { Text, Button, View, Image, StyleSheet, AsyncStorage, TextInput, Picker, PickerItem, ScrollView, Animated, Dimensions, Platform, UIManager, LayoutAnimation, Keyboard } from "react-native";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-import * as config from "../Config.json";
+import { Dimensions, Keyboard, Platform, Text, TextInput, UIManager, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import * as config from "../Config.json";
 
 if (Platform.OS == "android" && UIManager.setLayoutAnimationEnabledExperimental) UIManager.setLayoutAnimationEnabledExperimental(true);
 

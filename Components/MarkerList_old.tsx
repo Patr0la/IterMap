@@ -1,10 +1,9 @@
 import React from "react";
-import { Platform, Dimensions, StyleSheet, ScrollView, View, Text } from "react-native";
-import { Marker, addNewMarkerAtDay } from "./Marker";
-import { EditMap } from "./EditMap";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Dimensions, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { EditMap } from "./EditMap";
+import { addNewMarkerAtDay, Marker } from "./Marker";
 
 interface Props extends IProps {
 	Map: EditMap;

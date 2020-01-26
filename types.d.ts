@@ -32,9 +32,10 @@ interface IUserData {
 }
 
 interface ICache {
-	cachedKeys: Array<{ value: string; lastUsed: number, maxAge: number, type: "image" | "json"}>;
+	cachedKeys: Array<{ value: string; lastUsed: number; maxAge: number; type: "image" | "json" }>;
 	cacheInitilized: boolean;
 	loadCache: (callback: () => void) => void;
+	getLastModified: (key: string, callback: (lastModified: number) => void) => void;
 	checkIfCached: (key: string) => void;
 	getCachedValue: (key: string, callback: (error: any, value: string) => void) => void;
 	addToCache: (key: string, maxAge: number, type: "image" | "json") => void;
@@ -55,6 +56,8 @@ interface IRoute {
 	title?: string;
 	creator?: string;
 	created?: number;
+
+	isPublic?: boolean;
 
 	score?: number;
 	votes?: Array<IVote>;
@@ -119,7 +122,7 @@ interface IMarker {
 
 interface ITime {
 	time: number;
-	unit: "m" | "h";
+	unit: "m" | "h" | "live";
 }
 
 interface ICost {

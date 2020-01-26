@@ -1,12 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { BetterImage } from "./BetterImage";
-
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-import * as config from "../Config.json";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { NavigationActions } from "react-navigation";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import * as config from "../Config.json";
+import { BetterImage } from "./BetterImage";
 
 interface IState {
 	loaded: boolean;

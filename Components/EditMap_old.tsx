@@ -1,13 +1,10 @@
 import React from "react";
-import { View, Platform, StyleSheet, Dimensions } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
-
+import { Dimensions, Platform, StyleSheet, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { BetterImage } from "./BetterImage";
-
 import * as config from "../Config.json";
 import { MapStyle } from "../MapStyle";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { CachableImage } from "./CachableImage";
 
 interface Props extends IProps, IRoute {

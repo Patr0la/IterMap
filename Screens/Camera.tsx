@@ -1,18 +1,10 @@
 import React from "react";
-
-import { View, Button, TextInput, StyleSheet, Text, Dimensions, StatusBarIOS, StatusBar, Animated, Platform, NativeEventEmitter } from "react-native";
-import { TouchableOpacity, PinchGestureHandler, State } from "react-native-gesture-handler";
-
-import { RNCamera, Point } from "react-native-camera";
-
+import { Animated, Dimensions, Platform, StatusBar, StyleSheet, View } from "react-native";
+import { Point, RNCamera } from "react-native-camera";
+import { PinchGestureHandler, State, TouchableOpacity } from "react-native-gesture-handler";
+import { accelerometer, SensorTypes, setUpdateIntervalForType } from "react-native-sensors";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-import * as config from "../Config.json";
-import { SearchBox } from "../Components/SearchBox";
-
-import { accelerometer, SensorTypes, setUpdateIntervalForType } from "react-native-sensors";
-
-import RNDeviceRotation from "react-native-device-rotation";
 interface Props extends IProps {}
 
 interface IState {
