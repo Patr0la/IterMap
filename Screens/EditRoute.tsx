@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, StyleSheet, Text, TextInput, View, ActivityIndicator } from "react-native";
+import { Dimensions, StyleSheet, Text, TextInput, View, ActivityIndicator, Picker } from "react-native";
 import { TouchableOpacity, Switch } from "react-native-gesture-handler";
 import ImagePicker, { Image as CropImage } from "react-native-image-crop-picker";
 import ProgressBar from "react-native-progress/Bar";
@@ -182,7 +182,16 @@ export class EditRoute extends React.Component<Props, State> {
 
 	sync() {
 		if (this.synced) return;
+		console.log("sync");
 		this.synced = true;
+		let toSend = {
+			id: this.state._id,
+			markers: this.state.markers,
+			title: this.state.title,
+			description: this.state.description,
+			isPublic: this.state.isPublic,
+			cost: this.state.cost
+		};
 		fetch(`${config.host}/api/setMarkersForRoute`, {
 			method: "POST",
 			headers: {
@@ -190,11 +199,7 @@ export class EditRoute extends React.Component<Props, State> {
 				Cookie: `session=${this.props.data.token}`,
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({
-				id: this.state._id,
-				markers: this.state.markers,
-				title: this.state.title,
-			}),
+			body: JSON.stringify(toSend),
 		}).then((res) => {
 			fetch(`${config.host}/api/getRouteDirections?id=${this.state._id || this.props.navigation.getParam("id", "undefined")}`, {
 				method: "GET",
@@ -220,6 +225,7 @@ export class EditRoute extends React.Component<Props, State> {
 	}
 
 	componentWillUnmount() {
+		this.sync();
 		clearInterval(this.syncInterval);
 	}
 
@@ -255,6 +261,46 @@ export class EditRoute extends React.Component<Props, State> {
 								this.synced = false;
 							}}
 						></TextInput>
+
+						<TextInput
+							style={{ ...styles.textInput, height: 100, marginTop: 0 }}
+							multiline
+							value={this.state?.description}
+							placeholder="Description..."
+							onChangeText={(description) => {
+								this.setState({ description });
+								this.synced = false;
+							}}
+						></TextInput>
+
+						<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+							<Text style={{ width: "33%" }}>Cost:</Text>
+
+							<TextInput
+								keyboardType="numeric"
+								style={{ ...styles.textInput, width: "13%", marginTop: 0, marginHorizontal: "5%" }}
+								value={this.state?.cost?.value?.toString()}
+								onChangeText={(cost) => {
+									//@ts-ignore
+									this.setState({ cost: { value: cost.length > 0 ? (isNaN(parseInt(cost)) ? this.state.cost.value : parseInt(cost)) : "", currency: this.state?.cost?.currency ?? "Local" } });
+									this.synced = false;
+								}}
+							></TextInput>
+							<Picker
+								mode="dropdown"
+								onValueChange={(currency) => {
+									this.setState({ cost: { value: this.state.cost.value, currency } });
+									this.synced = false;
+								}}
+								selectedValue={this.state?.cost?.currency ?? "Local"}
+								style={{ width: "43%" }}
+							>
+								<Picker.Item label="€" value="€"></Picker.Item>
+								<Picker.Item label="$" value="$"></Picker.Item>
+								<Picker.Item label="£" value="£"></Picker.Item>
+								<Picker.Item label="Local currency" value="Local"></Picker.Item>
+							</Picker>
+						</View>
 
 						{this.state.deletingRoute ? (
 							this.state.deletingRouteInProgress ? (
@@ -308,7 +354,15 @@ export class EditRoute extends React.Component<Props, State> {
 							<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.1 }}>
 								<View style={{ flex: 1, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
 									<Text>Is public: </Text>
-									<Switch value={this.state.isPublic} thumbColor="#242424" trackColor={{ false: "#aaaaaa", true: "#ad0a4c" }} onValueChange={(isPublic) => this.setState({ isPublic })}></Switch>
+									<Switch
+										value={this.state.isPublic}
+										thumbColor="#242424"
+										trackColor={{ false: "#aaaaaa", true: "#ad0a4c" }}
+										onValueChange={(isPublic) => {
+											this.setState({ isPublic });
+											this.synced = false;
+										}}
+									></Switch>
 								</View>
 								<View style={{ flex: 1, alignItems: "center", flexDirection: "column" }}>
 									<TouchableOpacity
@@ -347,8 +401,7 @@ export class EditRoute extends React.Component<Props, State> {
 										imageProps={{
 											source: null,
 											style: {
-												backgroundColor: "red",
-												display: "flex",
+												backgroundColor: "white",
 											},
 										}}
 										width={d.width * 0.4}

@@ -47,6 +47,7 @@ export class Profile extends React.Component<IProps, State> {
 		})
 			.then((res) => res.json())
 			.then((routesData) => {
+				console.log(routesData)
 				this.setState({ routesData, refreshing: false });
 			})
 			.catch((reason) => {

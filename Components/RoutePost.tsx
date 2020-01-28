@@ -5,6 +5,7 @@ import * as config from "../Config.json";
 import { AutoHeightImage } from "./AutoHeightImage";
 import { TraveledBy } from "./TraveledBy";
 import { CachableImage } from "./CachableImage";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface Props extends IProps, IRoute {}
 
@@ -14,6 +15,8 @@ interface State extends IRoute {
 
 	width: number;
 	height: number;
+
+	routeMenuOpen: boolean;
 }
 export class RoutePost extends React.Component<Props, State> {
 	constructor(props: Props) {
@@ -23,6 +26,8 @@ export class RoutePost extends React.Component<Props, State> {
 			...props,
 			width: 0,
 			height: 0,
+
+			routeMenuOpen: false,
 		};
 	}
 	componentDidMount() {
@@ -40,41 +45,70 @@ export class RoutePost extends React.Component<Props, State> {
 
 	render() {
 		return (
-			<View style={{ backgroundColor: "#323232" }}>
+			<View
+				style={{ backgroundColor: "#323232" }}
+				onLayout={(e) => {
+					console.table(e.nativeEvent.layout);
+				}}
+			>
 				<View style={styles.header}>
-					<View style={{ alignItems: "center", flexDirection: "row", alignContent: "center" }}>
-						<Text style={styles.title}>{this.state.title}</Text>
-						<Text style={styles.madeBy}> : by {this.state.creator}</Text>
-					</View>
+					<TouchableOpacity
+						style={{ backgroundColor: "#323232" }}
+						activeOpacity={1}
+						onPress={() => {
+							console.log("NAVIGATING TO ROUTE PREVIRE");
+							this.props.navigation.navigate("RoutePreviewScreen", { id: this.state._id });
+						}}
+					>
+						<View style={{ alignItems: "center", flexDirection: "row", alignContent: "center" }}>
+							<Text style={styles.title}>{this.state.title}</Text>
+							<Text style={styles.madeBy}> : by {this.state.creator}</Text>
+						</View>
+					</TouchableOpacity>
 					{this.state.creator == this.props.data.username && (
-						<Text onPress={() => this.props.navigation.navigate("EditRoute", { id: this.state._id })} style={{ marginRight: 10 }}>
+						<TouchableOpacity
+							onLayout={(e) => {
+								console.table(e.nativeEvent.layout);
+							}}
+							onPress={() => this.props.navigation.navigate("EditRoute", { id: this.state._id })}
+							style={{ marginRight: 10 }}
+						>
 							<Icon name="dots-vertical" size={24} color="white" />
-						</Text>
+						</TouchableOpacity>
 					)}
 				</View>
 
-				<AutoHeightImage
-					parent={this}
-					source={{
-						uri: `${config.host}/api/routeImage?id=${this.state._id}`,
-						headers: {},
-						// TODO get headers
-						// headers: {
-						// 	Cookie: `session=${this.props.data.token}`,
-						// },
-						// method: "GET"
+				<TouchableOpacity
+					style={{ backgroundColor: "#323232" }}
+					activeOpacity={1}
+					onPress={() => {
+						console.log("NAVIGATING TO ROUTE PREVIRE");
+						this.props.navigation.navigate("RoutePreviewScreen", { id: this.state._id });
 					}}
-					imageProps={{
-						source: null,
-						style: {
-							backgroundColor: "red",
-							display: "flex",
-						},
-					}}
-					width={d.width}
-					data={this.props.data}
-					cantUpdateCuzOfImageCacheBug
-				></AutoHeightImage>
+				>
+					<AutoHeightImage
+						parent={this}
+						source={{
+							uri: `${config.host}/api/routeImage?id=${this.state._id}`,
+							headers: {},
+							// TODO get headers
+							// headers: {
+							// 	Cookie: `session=${this.props.data.token}`,
+							// },
+							// method: "GET"
+						}}
+						imageProps={{
+							source: null,
+							style: {
+								backgroundColor: "#323232",
+								display: "flex",
+							},
+						}}
+						width={d.width}
+						data={this.props.data}
+						cantUpdateCuzOfImageCacheBug
+					></AutoHeightImage>
+				</TouchableOpacity>
 
 				{/*
 					<Image
@@ -94,22 +128,39 @@ export class RoutePost extends React.Component<Props, State> {
 
 				{/*<BetterImage imageSource="web" parentViewStyle={{ height: 360, width: "100%" }} imageStyle={styles.image} data={this.props.data} navigation={this.props.navigation} url={`${config.host}/api/routeImage?id=${this.props._id}`}></BetterImage>*/}
 
-				<View style={styles.info}>
-					<Text style={styles.text}>
-						{this.state.score} <Icon name="star" size={24} color="white" />
-					</Text>
-					<Text style={styles.text}>
-						{this.state.uses} <Icon name="eye-outline" size={24} color="white" />
-					</Text>
-					<Text style={styles.text}>
-						{this.state.travelTime} <Icon name="clock-outline" size={24} color="white" />
-					</Text>
-					{this.state.cost ? <Text style={styles.text}>
-						{this.state.cost} <Icon name="cash-multiple" size={24} color="white" />
-					</Text> : null}
+				<TouchableOpacity
+					style={{ backgroundColor: "#323232" }}
+					activeOpacity={1}
+					onPress={() => {
+						console.log("NAVIGATING TO ROUTE PREVIRE");
+						this.props.navigation.navigate("RoutePreviewScreen", { id: this.state._id });
+					}}
+				>
+					<View style={styles.info}>
+						<View style={styles.infoPart}>
+							<Text style={styles.text}>{this.state.score} </Text>
+							<Icon name="star" size={24} color="white" />
+						</View>
+						<View style={styles.infoPart}>
+							<Text style={styles.text}>{this.state.uses} </Text>
+							<Icon name="eye-check" size={24} color="white" />
+						</View>
+						{this.state.days && (
+							<View style={styles.infoPart}>
+								<Text style={styles.text}>{this.state.days} </Text>
+								<Icon name="calendar-today" size={24} color="white" />
+							</View>
+						)}
+						{this.state.cost ? (
+							<View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+								<Text style={styles.text}>{this.state.cost.value} </Text>
+								{this.state.cost.currency != "Local" ? <Text style={styles.text}>{this.state.cost.currency}</Text> : <Icon name="cash-multiple" size={24} color="white" />}
+							</View>
+						) : null}
 
-					<TraveledBy traveledBy={this.state.traveledBy}> </TraveledBy>
-				</View>
+						<TraveledBy traveledBy={this.state.traveledBy}> </TraveledBy>
+					</View>
+				</TouchableOpacity>
 			</View>
 		);
 	}
@@ -160,11 +211,17 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		flexDirection: "row",
 		alignItems: "center",
+		alignContent: "center",
 		minHeight: d.height * 0.05,
 		backgroundColor: "#323232",
 		width: "100%",
 		color: "white",
 		paddingHorizontal: "2.5%",
+	},
+	infoPart: {
+		justifyContent: "center",
+		flexDirection: "row",
+		alignItems: "center",
 	},
 	text: {
 		color: "white",

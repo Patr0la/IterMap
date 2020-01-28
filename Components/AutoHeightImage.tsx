@@ -41,10 +41,10 @@ export class AutoHeightImage extends CachableImage<Props, State> {
 			Image.getSize(
 				`file://${this.state.path}`,
 				(width, height) => {
-					this.setState({ lastPath:this.state.path, height: (this.props.width / width) * height, width: this.props.width });
+					this.setState({ lastPath: this.state.path, height: (this.props.width / width) * height, width: this.props.width });
 
 					this.image.forceUpdate();
-					this.props.parent.setState({key: new Date().toString()})
+					this.props.parent.setState({ key: new Date().toString() });
 				},
 				(err) => {
 					console.log(err);
@@ -56,7 +56,6 @@ export class AutoHeightImage extends CachableImage<Props, State> {
 	}
 
 	render() {
-
 		return this.state.path && this.state.height && this.state.width ? (
 			<View style={{ backgroundColor: "white", width: "100%" }}>
 				<Image
@@ -64,6 +63,8 @@ export class AutoHeightImage extends CachableImage<Props, State> {
 					resizeMethod="auto"
 					resizeMode="contain"
 					style={{
+						//@ts-ignore
+						...this.props.imageProps.style,
 						width: this.state.width,
 						height: this.state.height,
 					}}
@@ -72,7 +73,7 @@ export class AutoHeightImage extends CachableImage<Props, State> {
 					onLoad={(e) => {
 						console.log("LOADED:  " + e.nativeEvent.source.url);
 					}}
-					onError={(err) => {}}y
+					onError={(err) => {}}
 					source={{ uri: `file://${this.state.path}`, cache: "reload" }}
 				></Image>
 			</View>

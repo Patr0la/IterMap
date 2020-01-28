@@ -32,7 +32,6 @@ export class Cache implements ICache {
 				AsyncStorage.setItem("cachedKeys", "[]");
 			}
 
-			console.log(await RNFetchBlob.fs.ls(`${CACHE_DIR}`));
 			let exists = await RNFetchBlob.fs.exists(CACHE_DIR);
 			if (!exists) RNFetchBlob.fs.mkdir(CACHE_DIR);
 		});
@@ -61,9 +60,14 @@ export class Cache implements ICache {
 
 	public async getCachedValue(key: string, callback: (error: any, value: string) => void) {
 		if (this.checkIfCached(key)) {
-			RNFetchBlob.fs.readFile(`${CACHE_DIR}/${key}`, "utf8").then((file) => {
-				callback(null, file);
-			});
+			RNFetchBlob.fs
+				.readFile(`${CACHE_DIR}/${key}`, "utf8")
+				.then((file) => {
+					callback(null, file);
+				})
+				.catch((err) => {
+					callback(err, null);
+				});
 
 			let i = this.cachedKeys.findIndex(({ value }) => value == key);
 			this.cachedKeys[i].lastUsed = Math.floor(new Date().getTime() / 1000);

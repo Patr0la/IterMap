@@ -24,6 +24,8 @@ import { ImageTaken } from "./Screens/ImageTaken";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Gallery } from "./Screens/GalleryScreen";
+import { RoutesPreview } from "./Components/RoutesPreview";
+import { RoutePreview } from "./Screens/RoutePreview";
 
 /*
     let uri = { uri: "https://www.rspcasa.org.au/wp-content/uploads/2019/01/Adopt-a-cat-or-kitten-from-RSPCA.jpg" };
@@ -73,6 +75,10 @@ const HomeScreen = (props) => {
 
 const ProfileScreen = (props) => {
 	return <Profile data={userData} navigation={props.navigation}></Profile>;
+};
+
+const RoutePreviewScreen = (props) => {
+	return <RoutePreview  data={userData} navigation={props.navigation}></RoutePreview>;
 };
 
 const LoadingScreenScreen = (props) => {
@@ -152,6 +158,13 @@ const ProfileStack = createStackNavigator({
 	EditRoute: {
 		screen: EditRouteScreen,
 		navigationOptions: () => ({
+			header: null,
+			drawerLockMode: "locked-closed",
+		}),
+	},
+	RoutePreviewScreen: {
+		screen: RoutePreviewScreen,
+		navigationOptions: ({ navigation }) => ({
 			header: null,
 			drawerLockMode: "locked-closed",
 		}),

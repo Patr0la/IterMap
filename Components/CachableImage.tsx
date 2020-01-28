@@ -72,6 +72,7 @@ export class CachableImage<a, b> extends React.Component<Props & a, State & b> {
 									// response data will be saved to this path if it has access right.
 									path: `${CACHE_DIR}/${hash}`,
 									overwrite: true,
+									...this.props.source.headers,
 								})
 									.fetch("GET", props.source.uri, this.props.source.headers)
 									.then((res) => {
@@ -96,13 +97,25 @@ export class CachableImage<a, b> extends React.Component<Props & a, State & b> {
 						});
 				});
 			} else {
+				console.log("DOWNLOADING");
 				this.props.data.cache.addToCache(hash, MAX_AGE.week * 2, "image");
 				RNFetchBlob.config({
 					// response data will be saved to this path if it has access right.
 					path: `${CACHE_DIR}/${hash}`,
 				})
 					.fetch("GET", props.source.uri, this.props.source.headers)
-					.then((res) => {});
+					.then((res) => {
+						this.props.data.cache.addToCache(hash, MAX_AGE.week * 2, "image");
+
+						//@ts-ignore
+						this.setState({ path: `${CACHE_DIR}/${hash}?rnd=${new Date().getTime()}`, key: new Date().getTime().toString() });
+
+						if (!this.image) {
+							console.log("REEEE");
+						} else {
+							this.image.setNativeProps({ key: new Date().getTime().toString() });
+						}
+					});
 			}
 		});
 	}
@@ -110,14 +123,6 @@ export class CachableImage<a, b> extends React.Component<Props & a, State & b> {
 	image: Image;
 
 	render() {
-		return (
-			<Image
-				ref={(ref) => (this.image = ref)}
-				{...this.props.imageProps}
-				key={`file://${this.state.path}`}
-				onError={(err) => {}}
-				source={{ uri: `file://${this.state.path}`, cache: "reload" }}
-			></Image>
-		);
+		return <Image ref={(ref) => (this.image = ref)} {...this.props.imageProps} key={`file://${this.state.path}`} onError={(err) => {}} source={{ uri: `file://${this.state.path}`, cache: "reload" }}></Image>;
 	}
 }

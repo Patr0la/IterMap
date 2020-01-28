@@ -54,6 +54,7 @@ interface IRoute {
 	_id?: ObjectId & string;
 
 	title?: string;
+	description?: string;
 	creator?: string;
 	created?: number;
 
@@ -65,7 +66,9 @@ interface IRoute {
 	uses?: number;
 
 	travelTime?: number;
-	cost?: number;
+	cost?: ICost;
+
+	days?: number;
 
 	markers?: Array<IMarker>;
 	path?: Array<Array<IPos>>;
