@@ -11,9 +11,8 @@ import { PreviewMarkerList } from "./PreviewMarkerList";
 interface Props extends IProps, IRoute {
 	routeId: string;
 
-	onDaySelect: (day: number, important?: boolean) => void;
-
 	selectedDay: number;
+	selectedMarker: number;
 
 	markerList: PreviewMarkerList;
 }
@@ -36,9 +35,9 @@ export class PreviewMap extends React.Component<Props, State> {
 		this.state = {
 			...props,
 
-			displayHeatMap: props.data.displayHeatMap,
-			displayMarkers: props.data.displayMarkers,
-			displayPath: props.data.displayPath,
+			displayHeatMap: false,
+			displayMarkers: true,
+			displayPath: true,
 			displaySatelite: props.data.displaySatelite,
 
 			displayOptions: false,
@@ -60,7 +59,7 @@ export class PreviewMap extends React.Component<Props, State> {
 						coordinate={pos}
 						key={i}
 						onPress={() => {
-							this.props.markerList?.setState({})
+							console.log("PRESS")
 						}}
 					>
 						{pictures && pictures[0] ? (
@@ -100,7 +99,7 @@ export class PreviewMap extends React.Component<Props, State> {
 		// }
 
 		return (
-			<View style={{ width: "100%", height: d.height * 0.35, zIndex: 1, padding: "5%", alignItems: "flex-end", flexDirection: "column", justifyContent: "space-between" }}>
+			<View style={{ width: "100%", height: d.height * 0.35, zIndex: 1, padding: "5%", alignItems: "flex-end", flexDirection: "column", justifyContent: "space-between", backgroundColor : "white"}}>
 				<MapView
 					cacheEnabled
 					ref={(ref) => (this.MapView = ref)}
@@ -109,6 +108,8 @@ export class PreviewMap extends React.Component<Props, State> {
 					mapType={this.state.displaySatelite ? "satellite" : "standard"}
 					customMapStyle={MapStyle}
 					provider={PROVIDER_GOOGLE}
+					liteMode
+					scrollEnabled={true}
 					// initialRegion={{
 					// 	latitude: this.state && this.state.lastMapPosition ? this.state.lastMapPosition.latitude : 0,
 					// 	longitude: this.state && this.state.lastMapPosition ? this.state.lastMapPosition.longitude : 0,
@@ -120,19 +121,20 @@ export class PreviewMap extends React.Component<Props, State> {
 						this.props.path?.length > 2
 							? this.MapView.fitToCoordinates(
 									this.props.path.reduce((pv, p) => pv.concat(p), []),
-									{ animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } },
+									{ animated: false, edgePadding: { bottom: 100, left: 100, right: 100, top: 100 } },
 							  )
 							: this.props.livePath?.length
-							? this.MapView.fitToCoordinates(this.props.livePath, { animated: false, edgePadding: { bottom: 50, left: 50, right: 50, top: 50 } })
+							? this.MapView.fitToCoordinates(this.props.livePath, { animated: false, edgePadding: { bottom: 100, left: 100, right: 100, top: 100 } })
 							: null
 					}
 				>
 					{this.state.displayMarkers && this.markersOnMap}
 					{/*this.state && this.props.path && this.props.path.length > 1 && this.props.path[this.props.selectedDay - 1].map((path) => (path.length > 0 ? <Polyline coordinates={path} strokeColor="#AD0A4C" strokeWidth={6}></Polyline> : null))*/}
-
+					{(() => {
+						console.log("DAY: "  + this.props.selectedDay);
+						return null;
+					})()}
 					{this.props?.path?.[this.props.selectedDay - 1]?.length > 1 && <Polyline coordinates={this.props.path[this.props.selectedDay - 1]} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
-
-					{this.state && this.props.livePath && this.props.livePath.length > 1 && <Polyline coordinates={this.props.livePath} strokeColor="#AD0A4C" strokeWidth={6}></Polyline>}
 				</MapView>
 
 				<View style={{ flexDirection: "column", alignSelf: "flex-end", justifyContent: "center", alignItems: "center", ...(this.state.displayOptions ? { backgroundColor: "white", borderRadius: 5, elevation: 5 } : {}) }}>

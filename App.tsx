@@ -26,6 +26,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { Gallery } from "./Screens/GalleryScreen";
 import { RoutesPreview } from "./Components/RoutesPreview";
 import { RoutePreview } from "./Screens/RoutePreview";
+import { PreviewRouteMarker } from "./Screens/PreviewRouteMarker";
 
 /*
     let uri = { uri: "https://www.rspcasa.org.au/wp-content/uploads/2019/01/Adopt-a-cat-or-kitten-from-RSPCA.jpg" };
@@ -78,7 +79,7 @@ const ProfileScreen = (props) => {
 };
 
 const RoutePreviewScreen = (props) => {
-	return <RoutePreview  data={userData} navigation={props.navigation}></RoutePreview>;
+	return <RoutePreview data={userData} navigation={props.navigation}></RoutePreview>;
 };
 
 const LoadingScreenScreen = (props) => {
@@ -136,6 +137,10 @@ const GalleryScreen = (props) => {
 	return <Gallery data={userData} navigation={props.navigation}></Gallery>;
 };
 
+const PreviewRouteMarkerScreen = (props) => {
+	return <PreviewRouteMarker data={userData} navigation={props.navigation}></PreviewRouteMarker>;
+};
+
 const RouteCreationStack = createStackNavigator({
 	CreateNewRoute: {
 		screen: CreateNewRouteScreen,
@@ -164,6 +169,13 @@ const ProfileStack = createStackNavigator({
 	},
 	RoutePreviewScreen: {
 		screen: RoutePreviewScreen,
+		navigationOptions: ({ navigation }) => ({
+			header: null,
+			drawerLockMode: "locked-closed",
+		}),
+	},
+	PreviewRouteMarkerScreen: {
+		screen: PreviewRouteMarkerScreen,
 		navigationOptions: ({ navigation }) => ({
 			header: null,
 			drawerLockMode: "locked-closed",
@@ -367,4 +379,4 @@ export default App;
 
 //#endregion
 
-StatusBar.setBackgroundColor("#222222", true);
+StatusBar.setBackgroundColor("#242424", true);

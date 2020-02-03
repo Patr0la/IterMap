@@ -62,6 +62,7 @@ interface IRoute {
 
 	score?: number;
 	votes?: Array<IVote>;
+	voted?: number;
 	views?: number;
 	uses?: number;
 
@@ -78,6 +79,8 @@ interface IRoute {
 	lastMapPosition?: IPos;
 
 	canEdit?: boolean;
+
+	isLiveRoute? : boolean;
 }
 
 interface IVote {
@@ -144,6 +147,10 @@ interface IProfileEntry {
 	routes?: Array<import("bson").ObjectID>;
 
 	score?: number;
+	joined?: number;
+
+	description?: string;
+	favoriteRoute?: IRoute;
 }
 
 interface ILiveRoute {

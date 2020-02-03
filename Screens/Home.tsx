@@ -9,6 +9,7 @@ import * as config from "../Config.json";
 import { DataKeys } from "../UserData";
 import { Camera } from "./Camera";
 import { LiveRoute } from "./LiveRoute";
+import { RoutesPreview } from "../Components/RoutesPreview";
 
 interface Props extends IProps {}
 
@@ -17,6 +18,8 @@ interface State {
 	scrollEnabled: boolean;
 
 	currentStepCount?: number;
+
+	topRoutes: Array<IRoute>;
 }
 
 export class Home extends React.Component<Props, State> {
@@ -65,11 +68,33 @@ export class Home extends React.Component<Props, State> {
 		this.state = {
 			viewing: "world",
 			scrollEnabled: true,
+			topRoutes: [],
 		};
+
+		fetch(`${config.host}/api/getTopRoutes`, {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				Cookie: `session=${this.props.data.token}`,
+				"Content-Type": "application/json",
+			},
+
+			body: JSON.stringify({
+				skip: 0,
+			}),
+		})
+			.then((res) => res.json())
+			.then((topRoutes) => {
+				this.setState({ topRoutes }, () => this.RoutesPreview.forceUpdate());
+				console.log(topRoutes);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	}
 
 	Searchbar: SearchBox;
-
+	RoutesPreview: RoutesPreview;
 	home() {
 		return (
 			<View>
@@ -84,29 +109,36 @@ export class Home extends React.Component<Props, State> {
 						console.log(selection); // TODO Navigate to thism
 					}}
 				/>
-				{this.props.data && this.props.data.lastLocation ? (
-					<View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+
+				<View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+					{this.props.data && this.props.data.lastLocation && (
 						<TouchableOpacity style={{ ...styles.button, ...(this.state.viewing == "nearby" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }} onPress={() => this.setState({ viewing: "nearby" })}>
 							<Text style={styles.buttonText}>Nearby</Text>
 						</TouchableOpacity>
+					)}
+					{this.props.data && this.props.data.lastLocation && (
 						<TouchableOpacity style={{ ...styles.button, ...(this.state.viewing == "country" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }} onPress={() => this.setState({ viewing: "country" })}>
 							<Text style={styles.buttonText}>{this.props.data.lastLocation.country}</Text>
 						</TouchableOpacity>
-						<TouchableOpacity style={{ ...styles.button, ...(this.state.viewing == "world" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }} onPress={() => this.setState({ viewing: "world" })}>
-							<Text style={styles.buttonText}>World</Text>
-						</TouchableOpacity>
-					</View>
-				) : (
-					<View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-						<TouchableOpacity style={{ ...styles.button, ...(this.state.viewing == "world" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }} onPress={() => this.setState({ viewing: "world" })}>
-							<Text style={{ ...styles.buttonText, width: d.width }}>World</Text>
-						</TouchableOpacity>
-					</View>
-				)}
+					)}
+					<TouchableOpacity style={{ ...styles.button, ...(this.state.viewing == "world" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }} onPress={() => this.setState({ viewing: "world" })}>
+						<Text style={styles.buttonText}>World</Text>
+					</TouchableOpacity>
+				</View>
 
 				{!this.props.data.online && (
 					<View style={{ alignItems: "center", justifyContent: "center", width: "100%", backgroundColor: "#242424" }}>
 						<Text style={{ color: "white" }}>Offline</Text>
+					</View>
+				)}
+
+				{this.state.viewing == "nearby" ? (
+					<View></View>
+				) : this.state.viewing == "country" ? (
+					<View></View>
+				) : (
+					<View>
+						{this.state.topRoutes && <RoutesPreview ref={ref => this.RoutesPreview = ref} routeData={this.state.topRoutes} data={this.props.data} navigation={this.props.navigation}></RoutesPreview>}
 					</View>
 				)}
 

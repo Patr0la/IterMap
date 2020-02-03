@@ -5,40 +5,48 @@ import { RoutePost } from "./RoutePost";
 
 interface Props extends IProps {
 	routeData: Array<IRoute>;
+
+	onNearToEnd?: () => void;
 }
 
 interface State extends IRoute {
 	//title: string;
 	//votes: string;
 
-	routeData: Array<IRoute>;
+	
 }
 export class RoutesPreview extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 
 		this.state = {
-			routeData: this.props.routeData,
+			//routeData: this.props.routeData,
 		};
 	}
 
+	  
 	render() {
 		console.table(this.props.navigation.getParam("mandatoryRefresh", false));
-		if (this.state && this.state.routeData) {
+		if (this.props && this.props.routeData) {
 			// TODO Implement image CDmN
 			return (
 				<FlatList
 					renderItem={(route) => {
 						if (route == null) return <View style={{ height: 100, width: "100%" }}></View>;
-						return <RoutePost {...route.item} navigation={this.props.navigation} data={this.props.data}></RoutePost>;
+						return <RoutePost {...route.item} navigation={this.props.navigation} data={this.props.data} parent={this} ></RoutePost>;
 					}}
-					data={this.state.routeData}
+					data={this.props.routeData}
 					keyExtractor={(a) => a?._id ?? new Date().getTime().toString()}
 					style={styles.view}
 					ItemSeparatorComponent={() => <View style={{ backgroundColor: "#242424", width: "100%", height: d.height * 0.01 }}></View>}
 					ListFooterComponent={() => {
 						return <View style={{ height: d.height * 0.5, width: "100%", backgroundColor: "#242424" }}></View>;
 					}}
+					onEndReached={() => {
+						console.log("END REACHED");
+						this.props.onNearToEnd?.();
+					}}
+					onEndReachedThreshold={0.1}
 				></FlatList>
 			);
 		} else {

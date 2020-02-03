@@ -1,5 +1,5 @@
 {
-    "host": "http://192.168.1.7:8000",
+    "host": "http://192.168.1.5:8000",
     "development" : true,
     "releaseHost": "35.237.173.77"
 }

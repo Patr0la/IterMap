@@ -7,26 +7,62 @@ import { BetterImage } from "./BetterImage";
 
 interface IState {
 	loaded: boolean;
+
+	score: number;
+	numberOfRoutes: number;
 }
 
 export class SideMenu extends React.Component<IProps, IState> {
 	constructor(props) {
 		super(props);
 
-		this.shouldComponentUpdate.bind(this);
+		// this.shouldComponentUpdate.bind(this);
 
 		this.state = {
 			loaded: false,
+			score: -1,
+			numberOfRoutes: -1,
 		};
+
+		if (this.props.data.username) {
+			fetch(`${config.host}/api/myProfileInfo`, {
+				headers: {
+					Accept: "application/json",
+					Cookie: `session=${this.props.data.token}`,
+					"Content-Type": "application/json",
+				},
+			})
+				.then((res) => res.json())
+				.then((profileInfo) => {
+					this.setState({ score: profileInfo?.score });
+
+					fetch(`${config.host}/api/getMyRoutes`, {
+						headers: {
+							Accept: "application/json",
+							Cookie: `session=${this.props.data.token}`,
+							"Content-Type": "application/json",
+						},
+					})
+						.then((res) => res.json())
+						.then((routesData) => {
+							console.log(routesData);
+							console.log("WTRFDDAHJGFHDGSJFGSDJhj")
+							console.log(routesData.length)
+							this.setState({ numberOfRoutes: routesData?.length });
+						})
+						.catch((reason) => {});
+				})
+				.catch((reason) => {});
+		}
 	}
 
 	navigateTo(route: string) {
 		this.props.navigation.navigate({ routeName: route });
 	}
 
-	shouldComponentUpdate(nextProps, nextState) {
-		return !this.state.loaded;
-	}
+	// shouldComponentUpdate(nextProps, nextState) {
+	// 	return !this.state.loaded;
+	// }
 
 	render() {
 		return (
@@ -42,11 +78,11 @@ export class SideMenu extends React.Component<IProps, IState> {
 					<Text style={{ alignSelf: "center", fontSize: 16, color: "white" }}>{this.props.data.username}</Text>
 
 					<View style={styles.row}>
-						<Icon name="eye" size={22} color="#aaaaaa" />
-						<Text style={{ fontSize: 16, color: "white" }}>233</Text>
+						<Icon name="map" size={32} color="white" />
+						<Text style={{ fontSize: 16, color: "white" }}>{this.state.numberOfRoutes}</Text>
 						<View style={{ backgroundColor: "#aaaaaa", height: 30, width: 1 }} />
-						<Icon name="arrow-up-bold" size={22} color="#aaaaaa" />
-						<Text style={{ fontSize: 16, color: "white" }}>3</Text>
+						<Text style={{ fontSize: 16, color: "white" }}>{this.state.score}</Text>
+						<Icon name="arrow-up-bold-hexagon-outline" size={32} color="#ad0a4c" />
 					</View>
 
 					<View style={{ backgroundColor: "#aaaaaa", width: "80%", height: 1, marginLeft: "10%", marginTop: "4%", marginBottom: "5%" }} />

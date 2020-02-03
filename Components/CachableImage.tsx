@@ -97,7 +97,6 @@ export class CachableImage<a, b> extends React.Component<Props & a, State & b> {
 						});
 				});
 			} else {
-				console.log("DOWNLOADING");
 				this.props.data.cache.addToCache(hash, MAX_AGE.week * 2, "image");
 				RNFetchBlob.config({
 					// response data will be saved to this path if it has access right.

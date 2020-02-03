@@ -77,13 +77,12 @@ export class Cache implements ICache {
 	}
 
 	public addToCache(key: string, maxAge: number, type: "image" | "json") {
-		console.log("CTIME: " + Math.floor(new Date().getTime() / 1000.0));
+
 		if (this.checkIfCached(key)) {
 			// let i = this.cachedKeys.findIndex(({ value }) => value == key);
 			// this.cachedKeys[i].lastUsed = Math.floor(new Date().getTime() / 1000);
 			return;
 		}
-		console.log("CACHED: " + key);
 		this.cachedKeys.push({ value: key, lastUsed: Math.floor(new Date().getTime() / 1000.0), maxAge, type });
 	}
 

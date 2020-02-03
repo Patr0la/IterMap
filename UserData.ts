@@ -94,6 +94,8 @@ export class UserData implements IUserData {
 
 						this.username = data.username;
 
+						this.myProfileInfo = {...data}
+
 						callback(true);
 					}
 				})
