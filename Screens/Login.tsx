@@ -2,6 +2,7 @@ import React from "react";
 import { AsyncStorage, Button, Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
 import { CachableImage } from "../Components/CachableImage";
 import * as config from "../Config.json";
+import { AutoHeightImage } from "../Components/AutoHeightImage";
 
 const sha = require("../sha");
 
@@ -27,7 +28,6 @@ export class Login extends React.Component<Props, State> {
 
 		const password = sha.sha512(this.state.password);
 
-		alert("logining in");
 		fetch(`${config.host}/api/login`, {
 			method: "POST",
 			headers: {
@@ -41,7 +41,6 @@ export class Login extends React.Component<Props, State> {
 		})
 			.then((res) => res.json())
 			.then((res) => {
-				alert("response: " + JSON.stringify(res));
 				if (res.token) {
 					AsyncStorage.setItem("token", res.token, (err) => {
 						if (err) {
@@ -51,44 +50,50 @@ export class Login extends React.Component<Props, State> {
 						this.props.navigation.navigate("Home");
 					});
 				} else {
-					alert("TODO"); //TODO Make error handling
+					// alert("TODO"); //TODO Make error handling
 				}
 			})
 			.catch((err) => {
-				alert(JSON.stringify(err));
+				console.log(err);
 			});
 	}
 
 	render() {
 		return (
-			<View style={styles.container}>
+			<View style={{ height: d.height, flexDirection: "column", justifyContent: "space-between" }}>
 				{/*<Text style={{ color: "#242424", fontSize: 16 }}>Welcom to Iter, you new best sightseeing friend!</Text>*/}
 
-				<Text style={{ fontSize: 22, color: "#242424", marginTop: "10%", height: d.height * 0.1 }}>Login or create account to continue.</Text>
-				<View style={{ width: "100%", padding: "5%", height: d.height * 0.2 }}>
-					<TextInput style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Username" placeholderTextColor="#242424" onChangeText={(username) => this.setState({ username })}></TextInput>
-					<TextInput style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Password" secureTextEntry placeholderTextColor="#242424" onChangeText={(password) => this.setState({ password })}></TextInput>
-				</View>
-				<View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-					<View style={{ flex: 10 }}></View>
-					<View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%", flexGrow: 0 }}>
-						<Button title={"Login"} onPress={this.login} color="#ad0a4c"></Button>
-						<Button title="Register" onPress={() => this.props.navigation.navigate("Register")} color="#ad0a4c"></Button>
+				<View style={styles.container}>
+					<Text style={{ fontSize: 22, color: "#242424", marginTop: "10%", height: d.height * 0.1 }}>Login or create account to continue.</Text>
+					<View style={{ width: "100%", padding: "5%", height: d.height * 0.2 }}>
+						<TextInput style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Username" placeholderTextColor="#242424" onChangeText={(username) => this.setState({ username })}></TextInput>
+						<TextInput style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Password" secureTextEntry placeholderTextColor="#242424" onChangeText={(password) => this.setState({ password })}></TextInput>
+					</View>
+					<View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+						<View style={{ flex: 10 }}></View>
+						<View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%", flexGrow: 0 }}>
+							<Button title={"Login"} onPress={this.login} color="#ad0a4c"></Button>
+							<Button title="Register" onPress={() => this.props.navigation.navigate("Register")} color="#ad0a4c"></Button>
+							<Button title="Forgot password" onPress={() => this.props.navigation.navigate("ForgotPasswordScreen")} color="#ad0a4c"></Button>
+						</View>
 					</View>
 				</View>
 
-				<CachableImage
-					source={{
-						uri: `${config.host}/banner.png`,
-						headers: {},
-					}}
-					data={this.props.data}
-					imageProps={{
-						source: null,
-						style: { flex: 1 },
-					}}
-				></CachableImage>
-				<View style={{ position: "absolute", height: d.height * 0.1, top: d.height * 0.9, width: "100%", backgroundColor: "#aaaaaa" }}></View>
+				<View>
+					<AutoHeightImage
+						source={{
+							uri: `${config.host}/banner.png`,
+							headers: {},
+						}}
+						data={this.props.data}
+						imageProps={{
+							source: null,
+						}}
+						width={d.width}
+						parent={this}
+					></AutoHeightImage>
+					<View style={{ height: d.height * 0.1, width: "100%", backgroundColor: "#aaaaaa" }}></View>
+				</View>
 			</View>
 		);
 	}
@@ -102,6 +107,6 @@ const styles = StyleSheet.create({
 		backgroundColor: "white",
 		alignItems: "center",
 		justifyContent: "flex-start",
-		height: "100%",
+		height: d.height,
 	},
 });

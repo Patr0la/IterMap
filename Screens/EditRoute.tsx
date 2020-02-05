@@ -329,6 +329,7 @@ export class EditRoute extends React.Component<Props, State> {
 													.then((state) => {
 														console.table(state);
 														if (state?.sucess) {
+															this.setState({ deletingRoute: false, deletingRouteInProgress: false });
 															this.props.navigation.setParams({ mandatoryRefresh: true });
 															this.props.navigation.goBack();
 														}

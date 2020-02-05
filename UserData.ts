@@ -6,15 +6,15 @@ import * as config from "./Config.json";
 
 import AsyncStorage from "@react-native-community/async-storage";
 
-import {Cache} from "./Cache"
+import { Cache } from "./Cache";
 
 export class UserData implements IUserData {
 	private initilized = false;
 
-    public online: boolean = true; //TODO on geolocation
-    
-    public cache: Cache;
-    
+	public online: boolean = true; //TODO on geolocation
+
+	public cache: Cache;
+
 	public initilize(callback: (success: boolean) => void, locationLoadedCallback: (sucess: boolean) => void): void {
 		let keys = [];
 		for (const v in DataKeys) {
@@ -22,7 +22,7 @@ export class UserData implements IUserData {
 		}
 
 		this.cache = new Cache(() => {
-			console.log("Cache loaded")
+			console.log("Cache loaded");
 		});
 
 		AsyncStorage.multiGet(keys, (err, res) => {
@@ -75,6 +75,7 @@ export class UserData implements IUserData {
 	}
 
 	public reftesh(callback: (sucess: boolean) => void) {
+		console.log("REFRESHING");
 		try {
 			fetch(`${config.host}/api/myProfileInfo`, {
 				method: "GET",
@@ -86,6 +87,9 @@ export class UserData implements IUserData {
 			})
 				.then((res) => res.json())
 				.then((data) => {
+					console.log("REFRESed");
+
+					data && console.table(data);
 					if (!data.username) {
 						this.token = "";
 						callback(false);
@@ -94,7 +98,7 @@ export class UserData implements IUserData {
 
 						this.username = data.username;
 
-						this.myProfileInfo = {...data}
+						this.myProfileInfo = { ...data };
 
 						callback(true);
 					}
@@ -192,6 +196,18 @@ export class UserData implements IUserData {
 	}
 	public set liveRoutesTracking(v: Array<{ id: string; name: string; tracking: boolean }>) {
 		this._liveRoutesTracking = v;
+
+		AsyncStorage.setItem(DataKeys.liveRoutesTracking, JSON.stringify(v), (err) => {
+			err && console.log(err); // ERR handle
+		});
+	}
+
+	private _liveRouteUpdateRate: number;
+	public get liveRouteUpdateRate(): number {
+		return this._liveRouteUpdateRate;
+	}
+	public set liveRouteUpdateRate(v: number) {
+		this._liveRouteUpdateRate = v;
 
 		AsyncStorage.setItem(DataKeys.liveRoutesTracking, JSON.stringify(v), (err) => {
 			err && console.log(err); // ERR handle
@@ -304,6 +320,7 @@ export enum DataKeys {
 
 	liveRoutesInCreation = "liveRoutesInCreation",
 	liveRoutesTracking = "liveRoutesTracking",
+	liveRouteUpdateRate = "liveRouteUpdateRate",
 
 	grid = "grid",
 	cameraFront = "cameraFront",
@@ -316,4 +333,4 @@ export enum DataKeys {
 	displaySatelite = "displaySatelite",
 }
 
-const DataKeysInJson: Array<string> = [DataKeys.lastLocation, DataKeys.myProfileInfo, DataKeys.myRoutes, DataKeys.liveRoutesInCreation, DataKeys.liveRoutesTracking, DataKeys.grid, DataKeys.cameraFront, DataKeys.displayAngle, DataKeys.flash, DataKeys.displayHeatMap, DataKeys.displayMarkers, DataKeys.displayPath, DataKeys.displaySatelite];
+const DataKeysInJson: Array<string> = [DataKeys.lastLocation, DataKeys.myProfileInfo, DataKeys.myRoutes, DataKeys.liveRoutesInCreation, DataKeys.liveRoutesTracking, DataKeys.liveRouteUpdateRate, DataKeys.grid, DataKeys.cameraFront, DataKeys.displayAngle, DataKeys.flash, DataKeys.displayHeatMap, DataKeys.displayMarkers, DataKeys.displayPath, DataKeys.displaySatelite];

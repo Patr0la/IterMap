@@ -20,6 +20,13 @@ interface State {
 	currentStepCount?: number;
 
 	topRoutes: Array<IRoute>;
+	topRoutesNextSkip: number;
+
+	countryRoutes: Array<IRoute>;
+	countryRoutesNextSkip: number;
+
+	nerbyRoutes: Array<IRoute>;
+	nerbyRoutesNextSkip: number;
 }
 
 export class Home extends React.Component<Props, State> {
@@ -69,9 +76,20 @@ export class Home extends React.Component<Props, State> {
 			viewing: "world",
 			scrollEnabled: true,
 			topRoutes: [],
+			topRoutesNextSkip: 0,
+			countryRoutes: [],
+			countryRoutesNextSkip: 0,
+			nerbyRoutes: [],
+			nerbyRoutesNextSkip: 0,
 		};
 
-		fetch(`${config.host}/api/getTopRoutes`, {
+		this.loadTop();
+		this.loadCountry();
+		this.loadNerby();
+	}
+
+	loadTop(skip?: boolean) {
+		fetch(`${config.host}/api/getTopRoutes?t=${new Date().getTime()}`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
@@ -85,8 +103,54 @@ export class Home extends React.Component<Props, State> {
 		})
 			.then((res) => res.json())
 			.then((topRoutes) => {
-				this.setState({ topRoutes }, () => this.RoutesPreview.forceUpdate());
-				console.log(topRoutes);
+				this.setState({ topRoutes: topRoutes.reverse() }, () => this.RoutesPreview.forceUpdate());
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}
+
+	loadCountry(skip?: boolean) {
+		fetch(`${config.host}/api/getCountryRoutes?t=${new Date().getTime()}`, {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				Cookie: `session=${this.props.data.token}`,
+				"Content-Type": "application/json",
+			},
+
+			body: JSON.stringify({
+				skip: 0,
+				country: this.props.data?.lastLocation?.country,
+			}),
+		})
+			.then((res) => res.json())
+			.then((countryRoutes) => {
+				this.setState({ countryRoutes: countryRoutes.reverse()});
+				console.log(countryRoutes);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}
+
+	loadNerby(skip?: boolean) {
+		fetch(`${config.host}/api/getNerbyRoutes?t=${new Date().getTime()}`, {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				Cookie: `session=${this.props.data.token}`,
+				"Content-Type": "application/json",
+			},
+
+			body: JSON.stringify({
+				skip: 0,
+				pos: this.props.data.lastPos,
+			}),
+		})
+			.then((res) => res.json())
+			.then((nerbyRoutes) => {
+				this.setState({ nerbyRoutes: nerbyRoutes.reverse() });
 			})
 			.catch((err) => {
 				console.log(err);
@@ -110,7 +174,7 @@ export class Home extends React.Component<Props, State> {
 					}}
 				/>
 
-				<View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+				<View style={{ flexDirection: "row", justifyContent: "space-evenly", backgroundColor: "#242424"}}>
 					{this.props.data && this.props.data.lastLocation && (
 						<TouchableOpacity style={{ ...styles.button, ...(this.state.viewing == "nearby" ? { borderBottomColor: "#ad0a4c", borderBottomWidth: 4 } : {}) }} onPress={() => this.setState({ viewing: "nearby" })}>
 							<Text style={styles.buttonText}>Nearby</Text>
@@ -133,13 +197,15 @@ export class Home extends React.Component<Props, State> {
 				)}
 
 				{this.state.viewing == "nearby" ? (
-					<View></View>
-				) : this.state.viewing == "country" ? (
-					<View></View>
-				) : (
 					<View>
-						{this.state.topRoutes && <RoutesPreview ref={ref => this.RoutesPreview = ref} routeData={this.state.topRoutes} data={this.props.data} navigation={this.props.navigation}></RoutesPreview>}
+						<RoutesPreview onRefresh={() => this.loadNerby()} routeData={this.state.nerbyRoutes} data={this.props.data} navigation={this.props.navigation}></RoutesPreview>
 					</View>
+				) : this.state.viewing == "country" ? (
+					<View>
+						<RoutesPreview onRefresh={() => this.loadCountry()}  routeData={this.state.countryRoutes} data={this.props.data} navigation={this.props.navigation}></RoutesPreview>
+					</View>
+				) : (
+					<View>{this.state.topRoutes && <RoutesPreview onRefresh={() => this.loadTop()}  ref={(ref) => (this.RoutesPreview = ref)} routeData={this.state.topRoutes} data={this.props.data} navigation={this.props.navigation}></RoutesPreview>}</View>
 				)}
 
 				{/*<AdMobBanner
@@ -177,7 +243,11 @@ export class Home extends React.Component<Props, State> {
 	_panResponder: PanResponderInstance;
 	viewPager: ViewPager;
 	render() {
-		if (!this.props.data.liveRoutesTracking?.reduce((pv, { tracking }) => tracking || pv, false)) return this.home();
+		if (!this.props.data.liveRoutesTracking?.reduce((pv, { tracking }) => tracking || pv, false)) {
+			StatusBar.setTranslucent(false);
+			StatusBar.setBackgroundColor("#242424");
+			return this.home();
+		}
 
 		StatusBar.setTranslucent(true);
 		StatusBar.setBackgroundColor("#24242411");

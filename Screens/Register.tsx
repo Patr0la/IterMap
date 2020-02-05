@@ -3,6 +3,7 @@ import { AsyncStorage, Button, Dimensions, Text, TextInput, View } from "react-n
 import { Switch } from "react-native-gesture-handler";
 import { CachableImage } from "../Components/CachableImage";
 import * as config from "../Config.json";
+import { AutoHeightImage } from "../Components/AutoHeightImage";
 
 //import { DataKeys } from "../Helper";
 const sha = require("../sha");
@@ -28,105 +29,93 @@ export class Register extends React.Component<Props, State> {
 
 		this.state = {
 			licenseAccepted: false,
+			passwordsMatch: false,
 		};
 	}
 
 	register() {
-		alert(JSON.stringify(this.state));
+		if (!this.state.username) return alert("Username is required.");
+		if (!this.state.password1) return alert("Password is required.");
+		if (!this.state.passwordsMatch) return alert("Passwords do not match.");
+		if (!this.state.email) return alert("Email is required.");
+		if (!this.state.licenseAccepted) return alert("You have to accept licence.");
 
-		if (this.state.licenseAccepted && this.state.passwordsMatch && this.state.password1 && this.state.username && this.state.email) {
-			const password = sha.sha512(this.state.password1);
+		const password = sha.sha512(this.state.password1);
 
-			alert(`${config.host}/api/register`);
-			fetch(`${config.host}/api/register`, {
-				method: "POST",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					username: this.state.username,
-					password: password,
-					email: this.state.email,
-				}),
+		fetch(`${config.host}/api/register`, {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				username: this.state.username,
+				password: password,
+				email: this.state.email,
+			}),
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				if (res.token) {
+					AsyncStorage.setItem("token", res.token, (err) => {
+						if (err) {
+							alert("Unable to access device storage.");
+							return;
+						}
+
+						this.props.navigation.navigate("Home");
+					});
+				} 
 			})
-				.then((res) => res.json())
-				.then((res) => {
-					alert("response: " + JSON.stringify(res));
-					if (res.token) {
-						AsyncStorage.setItem("token", res.token, (err) => {
-							if (err) {
-								alert("Unable to access device storage.");
-								return;
-							}
-
-							this.props.navigation.navigate("Home");
-						});
-					} else {
-						alert("TODO"); //TODO Make error handling
-					}
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-		}
-	}
-
-	confirmPasswordsMatch() {
-		this.setState({ passwordsMatch: true });
+			.catch((err) => {
+				console.log(err);
+			});
 	}
 
 	render() {
 		return (
-			<View
-				style={{
-					flex: 1,
-					backgroundColor: "white",
-					alignItems: "center",
-					justifyContent: "space-between",
-					height: "100%",
-				}}
-			>
+			
+			<View style={{ height: d.height, flexDirection: "column", justifyContent: "space-between" }}>
 				{/*<Text style={{ color: "#242424", fontSize: 16 }}>Welcom to Iter, you new best sightseeing friend!</Text>*/}
 
-				<Text style={{ fontSize: 22, color: "#242424", marginTop: "10%" }}>Login or create account to continue.</Text>
-				<View style={{ width: "100%", padding: "5%" }}>
-					<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Username" placeholderTextColor="#242424" onChangeText={(username) => this.setState({ username })}></TextInput>
-					<TextInput
-						style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }}
-						placeholderTextColor="#242424"
-						placeholder="Password"
-						onChangeText={(password1) => {
-							this.setState({ password1 });
-							this.confirmPasswordsMatch();
-						}}
-						secureTextEntry
-						autoCapitalize="none"
-					></TextInput>
-					<TextInput
-						style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }}
-						placeholderTextColor="#242424"
-						placeholder="Confirm Password"
-						onChangeText={(password2) => {
-							this.setState({ password2 });
-							this.confirmPasswordsMatch();
-						}}
-						secureTextEntry
-						autoCapitalize="none"
-					></TextInput>
-					<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholderTextColor="#242424" placeholder="E-mail" onChangeText={(email) => this.setState({ email })}></TextInput>
-					<View style={{ width: "100%", flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }}>
-						<Text>I accept license aggreement:</Text>
-						<Switch style={{ margin: "5%" }} thumbColor="#242424" trackColor={{ false: "#aaaaaa", true: "#ad0a4c" }} onValueChange={(licenseAccepted) => this.setState({ licenseAccepted })} value={this.state.licenseAccepted}></Switch>
+				<View style={{ backgroundColor: "white", alignItems: "center", justifyContent: "flex-start",flex:1, width: "100%"}}>
+					<Text style={{ fontSize: 22, color: "#242424", marginTop: "10%" }}>Login or create account to continue.</Text>
+					<View style={{ width: "100%", padding: "5%" }}>
+						<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Username" placeholderTextColor="#242424" onChangeText={(username) => this.setState({ username })}></TextInput>
+						<TextInput
+							style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }}
+							placeholderTextColor="#242424"
+							placeholder="Password"
+							onChangeText={(password1) => {
+								this.setState({ password1, passwordsMatch: password1 == this.state.password2 });
+							}}
+							secureTextEntry
+							autoCapitalize="none"
+						></TextInput>
+						<TextInput
+							style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }}
+							placeholderTextColor="#242424"
+							placeholder="Confirm Password"
+							onChangeText={(password2) => {
+								this.setState({ password2, passwordsMatch: this.state.password1 == password2 });
+							}}
+							secureTextEntry
+							autoCapitalize="none"
+						></TextInput>
+						<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholderTextColor="#242424" placeholder="E-mail" onChangeText={(email) => this.setState({ email })}></TextInput>
+						<View style={{ width: "100%", flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }}>
+							<Text>I accept license aggreement:</Text>
+							<Switch style={{ margin: "5%" }} thumbColor="#242424" trackColor={{ false: "#aaaaaa", true: "#ad0a4c" }} onValueChange={(licenseAccepted) => this.setState({ licenseAccepted })} value={this.state.licenseAccepted}></Switch>
+						</View>
+					</View>
+					<View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%", alignContent: "center", alignItems: "center" }}>
+						<Button title="Create account" onPress={this.register} color="#ad0a4c"></Button>
+						<Text style={{ color: "#242424" }}></Text>
+						<Button title="Back to login" onPress={() => this.props.navigation.navigate("Login")} color="#ad0a4c"></Button>
 					</View>
 				</View>
-				<View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%", alignContent: "center", alignItems: "center" }}>
-					<Button title="Create account" onPress={this.register} color="#ad0a4c"></Button>
-					<Text style={{ color: "#242424" }}></Text>
-					<Button title="Back to login" onPress={() => this.props.navigation.navigate("Login")} color="#ad0a4c"></Button>
-				</View>
-				<View style={{ flex: 1 }}></View>
-				<CachableImage
+
+				<AutoHeightImage
 					source={{
 						uri: `${config.host}/banner2.png`,
 						headers: {},
@@ -134,9 +123,13 @@ export class Register extends React.Component<Props, State> {
 					data={this.props.data}
 					imageProps={{
 						source: null,
-						style: { flex: 1 },
+						style:{
+							marginBottom: d.height * 0.1
+						}
 					}}
-				></CachableImage>
+					width={d.width}
+					parent={this}
+				></AutoHeightImage>
 			</View>
 		);
 	}

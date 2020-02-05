@@ -58,7 +58,7 @@ export class Marker extends React.Component<Props, State> {
 								return pv;
 							}, []);
 
-							cords?.length > 0 && this.props.map.MapView.fitToCoordinates(cords, { animated: true, edgePadding: { bottom: 20, top: 100, left: 50, right: 50 } });
+							cords?.length > 0 && this.props.map?.MapView?.fitToCoordinates(cords, { animated: true, edgePadding: { bottom: 20, top: 100, left: 50, right: 50 } });
 						}}
 					>
 						<Text style={{ marginHorizontal: "5%" }}>{marker.title}</Text>
@@ -104,7 +104,7 @@ export class Marker extends React.Component<Props, State> {
 				<View
 					style={{ ...styles.marker, top: this.props.top, justifyContent: "center" }}
 					onTouchEnd={() => {
-						this.props.map.MapView.animateCamera({ center: marker.pos });
+						this.props.map?.MapView?.animateCamera({ center: marker.pos });
 					}}
 				>
 					<Text style={{ marginHorizontal: "5%" }}>{marker.title}</Text>

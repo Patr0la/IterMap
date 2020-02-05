@@ -145,7 +145,7 @@ export class Profile extends React.Component<IProps, State> {
 								<Icon name="timer-sand" size={32} color="white" />
 							</View>
 							<View style={{ flexDirection: "row", alignItems: "center" }}>
-								{this.state.routesData?.length && <Text style={styles.text}> Routes created: {this.state.routesData.length} </Text>}
+								{this.state.routesData?.length ? <Text style={styles.text}> Routes created: {this.state.routesData.length} </Text> : <Text style={styles.text}> Routes created: 0 </Text>}
 								<Icon name="map" size={32} color="white" />
 							</View>
 						</View>
@@ -155,15 +155,17 @@ export class Profile extends React.Component<IProps, State> {
 						</View>
 
 						{this.state.favoriteRoute && (
-							<View style={{ backgroundColor: "#242424", marginVertical: "5%" }}>
-								<Text style={{ ...styles.text, margin: "2.5%" }}> Favorite Route:</Text>
-								<RoutePost {...this.state.favoriteRoute} navigation={this.props.navigation} data={this.props.data} parent={this}></RoutePost>
+							<View>
+								<View style={{ backgroundColor: "#242424", marginVertical: "5%" }}>
+									<Text style={{ ...styles.text, margin: "2.5%" }}> Favorite Route:</Text>
+									<RoutePost {...this.state.favoriteRoute} navigation={this.props.navigation} data={this.props.data} parent={this}></RoutePost>
+								</View>
+								<View style={{ backgroundColor: "#242424", height: d.height * 0.3 }}></View>
 							</View>
 						)}
-						<View style={{ backgroundColor: "#242424", height: d.height * 0.3 }}></View>
 					</ScrollView>
 				) : (
-					<View>{this.state.routesData && <RoutesPreview routeData={this.state.routesData} navigation={this.props.navigation} data={this.props.data}></RoutesPreview>}</View>
+					<View>{this.state.routesData && <RoutesPreview onRefresh={() => this.loadData()} routeData={this.state.routesData} navigation={this.props.navigation} data={this.props.data}></RoutesPreview>}</View>
 				)}
 			</View>
 		);

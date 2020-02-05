@@ -302,7 +302,7 @@ export class LiveRoute extends React.Component<Props, State> {
 											let filename = `${RNFetchBlob.fs.dirs.SDCardDir}/Iter/${id}_${new Date().getTime()}.json`;
 											RNFetchBlob.fs.writeFile(filename, res);
 
-											alert("exported to: " + filename);
+											// alert("exported to: " + filename);
 										});
 									});
 								});

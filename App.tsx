@@ -27,6 +27,7 @@ import { Gallery } from "./Screens/GalleryScreen";
 import { RoutesPreview } from "./Components/RoutesPreview";
 import { RoutePreview } from "./Screens/RoutePreview";
 import { PreviewRouteMarker } from "./Screens/PreviewRouteMarker";
+import { ForgotPassword } from "./Screens/ForgotPassword";
 
 /*
     let uri = { uri: "https://www.rspcasa.org.au/wp-content/uploads/2019/01/Adopt-a-cat-or-kitten-from-RSPCA.jpg" };
@@ -52,6 +53,10 @@ const RegisterScreen = (props) => {
 	return <Register navigation={props.navigation} data={userData}></Register>;
 };
 
+const ForgotPasswordScreen = (props) => {
+	return <ForgotPassword navigation={props.navigation} data={userData}></ForgotPassword>;
+};
+
 const AuthStack = createStackNavigator({
 	Login: {
 		screen: LoginScreen,
@@ -61,6 +66,12 @@ const AuthStack = createStackNavigator({
 	},
 	Register: {
 		screen: RegisterScreen,
+		navigationOptions: ({ navigation }) => ({
+			header: null,
+		}),
+	},
+	ForgotPasswordScreen: {
+		screen: ForgotPasswordScreen,
 		navigationOptions: ({ navigation }) => ({
 			header: null,
 		}),
@@ -91,7 +102,7 @@ const LogoutScreen = (props) => {
 };
 
 const SettingsScreen = (props) => {
-	return <Settings navigate={props.navigation.navigate}></Settings>;
+	return <Settings data={userData} navigation={props.navigation}></Settings>;
 };
 
 const CameraScreen = (props) => {
@@ -144,6 +155,9 @@ const PreviewRouteMarkerScreen = (props) => {
 const RouteCreationStack = createStackNavigator({
 	CreateNewRoute: {
 		screen: CreateNewRouteScreen,
+		navigationOptions: () => ({
+			header: null,
+		}),
 	},
 	EditRoute: {
 		screen: EditRouteScreen,
@@ -288,13 +302,85 @@ const Drawer = createDrawerNavigator(
 			}),
 		},
 		Profile: {
-			screen: ProfileStack,
-			path: "people/:name",
-			navigationOptions: ({ navigation }) => ({
-				title: `Profile`,
-				//naviagte: navigation.navigate,
+			screen: ProfileScreen,
+			navigationOptions: () => ({
+				// header: null,
 			}),
 		},
+		EditRoute: {
+			screen: EditRouteScreen,
+			navigationOptions: () => ({
+				header: null,
+				drawerLockMode: "locked-closed",
+			}),
+		},
+		RoutePreviewScreen: {
+			screen: RoutePreviewScreen,
+			navigationOptions: ({ navigation }) => ({
+				header: null,
+				drawerLockMode: "locked-closed",
+			}),
+		},
+		PreviewRouteMarkerScreen: {
+			screen: PreviewRouteMarkerScreen,
+			navigationOptions: ({ navigation }) => ({
+				header: null,
+				drawerLockMode: "locked-closed",
+			}),
+		},
+		MarkerEditScreen: {
+			screen: MarkerEditScreen,
+			navigationOptions: ({ navigation }) => ({
+				title: "Edit marker",
+				drawerLockMode: "locked-closed",
+				headerLeft: () => {
+					return (
+						<Icon
+							onPress={() => {
+								console.log(this);
+								console.log(navigation.getParam("data", {}));
+								navigation.getParam("callback", () => {})(navigation.getParam("data", {}));
+								navigation.goBack();
+							}}
+							name="arrow-left"
+							size={30}
+						/>
+					);
+				},
+				headerLeftContainerStyle: { marginLeft: "2.5%" },
+			}),
+		},
+		Gallery: {
+			screen: GalleryScreen,
+			navigationOptions: ({ navigation }) => ({
+				title: navigation.getParam("name", undefined) ? `Gallery for ${navigation.getParam("name")}` : "Gallery",
+				drawerLockMode: "locked-closed",
+
+				headerLeft: () => {
+					return (
+						<Icon
+							onPress={() => {
+								console.log(this);
+								console.log(navigation.getParam("data", {}));
+								navigation.getParam("callback", () => {})(navigation.getParam("data", {}));
+								navigation.goBack();
+							}}
+							name="arrow-left"
+							size={30}
+						/>
+					);
+				},
+				headerLeftContainerStyle: { marginLeft: "2.5%" },
+			}),
+		},
+		// Profile: {
+		// 	screen: ProfileStack,
+		// 	path: "people/:name",
+		// 	navigationOptions: ({ navigation }) => ({
+		// 		title: `Profile`,
+		// 		//naviagte: navigation.navigate,
+		// 	}),
+		// },
 		Settings: {
 			screen: SettingsScreen,
 			navigationOptions: () => ({
@@ -331,7 +417,7 @@ const Drawer = createDrawerNavigator(
 	},
 	{
 		initialRouteName: "Home",
-		unmountInactiveRoutes: true,
+		// unmountInactiveRoutes: true,
 		defaultNavigationOptions: {
 			title: "IterrMap",
 		},

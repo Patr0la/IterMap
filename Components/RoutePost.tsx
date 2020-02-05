@@ -19,10 +19,6 @@ interface State extends IRoute {
 	height: number;
 
 	routeMenuOpen: boolean;
-
-
-
-
 }
 export class RoutePost extends React.Component<Props, State> {
 	constructor(props: Props) {
@@ -36,6 +32,7 @@ export class RoutePost extends React.Component<Props, State> {
 			routeMenuOpen: false,
 		};
 	}
+
 	componentDidMount() {
 		Image.getSize(
 			`${config.host}/api/routeImage?id=${this.props._id}`,
@@ -74,11 +71,9 @@ export class RoutePost extends React.Component<Props, State> {
 
 					<View style={{ flexDirection: "row", alignItems: "center" }}>
 						<TouchableOpacity
-							onLayout={(e) => {
-								console.table(e.nativeEvent.layout);
-							}}
+							onLayout={(e) => {}}
 							onPress={() => {
-								this.props.data.myProfileInfo = { ...this.props.data.myProfileInfo, favoriteRoute: {_id: this.state._id}};
+								this.props.data.myProfileInfo = { ...this.props.data.myProfileInfo, favoriteRoute: { _id: this.state._id } };
 
 								this.props.parent.forceUpdate();
 
@@ -89,15 +84,14 @@ export class RoutePost extends React.Component<Props, State> {
 										"Content-Type": "application/json",
 									},
 									method: "POST",
-									body: JSON.stringify({ routeId: this.state._id}),
+									body: JSON.stringify({ routeId: this.state._id }),
 								})
 									.then((res) => res.json())
 									.then((route) => {});
-
 							}}
 							style={{ marginRight: 10 }}
 						>
-							<Icon name="heart" size={24} color={this.state._id == this.props.data.myProfileInfo.favoriteRoute._id ? "#ad0a4c" : "white"} />
+							<Icon name="heart" size={24} color={this.state._id == this.props.data.myProfileInfo?.favoriteRoute?._id ? "#ad0a4c" : "white"} />
 						</TouchableOpacity>
 						{this.state.creator == this.props.data.username && (
 							<TouchableOpacity
@@ -167,8 +161,7 @@ export class RoutePost extends React.Component<Props, State> {
 					<View style={{ ...styles.infoPart, width: "10%" }}>
 						<TouchableOpacity
 							onPress={() => {
-								this.setState({ score: this.state.score - this.state.voted + this.state.voted == 1 ? 0 : 1, voted: this.state.voted == 1 ? 0 : 1 });
-
+								this.setState({ voted: this.state.voted == 1 ? 0 : 1 });
 								fetch(`${config.host}/api/setVoteForRoute`, {
 									headers: {
 										Accept: "application/json",
@@ -184,10 +177,10 @@ export class RoutePost extends React.Component<Props, State> {
 						>
 							<Icon name="arrow-up-bold-hexagon-outline" size={26} color={this.state.voted == 1 ? "#ad0a4c" : "white"} />
 						</TouchableOpacity>
-						<Text style={styles.text}> {this.state.score} </Text>
+						<Text style={styles.text}> {this.props.score + (this.state.voted - this.props.voted )} </Text>
 						<TouchableOpacity
 							onPress={() => {
-								this.setState({ score: this.state.score - this.state.voted + this.state.voted == -1 ? 0 : -1, voted: this.state.voted == -1 ? 0 : -1 });
+								this.setState({ voted: this.state.voted == -1 ? 0 : -1 });
 								fetch(`${config.host}/api/setVoteForRoute`, {
 									headers: {
 										Accept: "application/json",

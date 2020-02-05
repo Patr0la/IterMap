@@ -46,8 +46,8 @@ export class SideMenu extends React.Component<IProps, IState> {
 						.then((res) => res.json())
 						.then((routesData) => {
 							console.log(routesData);
-							console.log("WTRFDDAHJGFHDGSJFGSDJhj")
-							console.log(routesData.length)
+							console.log("WTRFDDAHJGFHDGSJFGSDJhj");
+							console.log(routesData.length);
 							this.setState({ numberOfRoutes: routesData?.length });
 						})
 						.catch((reason) => {});
@@ -109,7 +109,26 @@ export class SideMenu extends React.Component<IProps, IState> {
 						</TouchableOpacity>
 					)}
 
-					<TouchableOpacity onPress={() => this.navigateTo("RouteCreation")} style={{ ...styles.touchableRow }}>
+					<TouchableOpacity
+						onPress={() => {
+							fetch(`${config.host}/api/newRoute`, {
+								method: "POST",
+								headers: {
+									Accept: "application/json",
+									Cookie: `session=${this.props.data.token}`,
+									"Content-Type": "application/json",
+								},
+								body: JSON.stringify({
+									name: "Route " + new Date().toLocaleDateString(),
+								}),
+							})
+								.then((res) => res.json())
+								.then((res) => {
+									this.props.navigation.navigate("EditRoute", { id: res.id });
+								});
+						}}
+						style={{ ...styles.touchableRow }}
+					>
 						<Icon name="plus" size={22} color="#aaaaaa" />
 						<Text style={{ marginLeft: "5%", fontSize: 16, color: "white" }}>Create new route</Text>
 					</TouchableOpacity>

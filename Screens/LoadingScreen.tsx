@@ -12,6 +12,7 @@ export class LoadingScreen extends React.Component<IProps, State> {
 		let goneHome = false;
 		props.data.initilize(
 			() => {
+				console.log("HERE WATING TOKEN");
 				if (props.data.token) {
 					setTimeout(() => {
 						console.log("reeee");

@@ -15,6 +15,7 @@ interface IUserData {
 	myProfileInfo: IProfileEntry;
 	liveRoutesInCreation: Array<{ id: string; name: string; tracking: boolean }>;
 	liveRoutesTracking: Array<{ id: string; name: string; tracking: boolean }>;
+	liveRouteUpdateRate: number;
 
 	initilize(callback: () => void, locationCallback: () => void): void;
 

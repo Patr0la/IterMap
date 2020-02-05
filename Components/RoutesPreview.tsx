@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, View, Dimensions } from "react-native";
+import { ActivityIndicator, StyleSheet, View, Dimensions, RefreshControl } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { RoutePost } from "./RoutePost";
 
@@ -7,12 +7,13 @@ interface Props extends IProps {
 	routeData: Array<IRoute>;
 
 	onNearToEnd?: () => void;
+	onRefresh?: () => void;
 }
 
 interface State extends IRoute {
 	//title: string;
 	//votes: string;
-
+	refreshing: boolean;
 	
 }
 export class RoutesPreview extends React.Component<Props, State> {
@@ -21,6 +22,7 @@ export class RoutesPreview extends React.Component<Props, State> {
 
 		this.state = {
 			//routeData: this.props.routeData,
+			refreshing: false,
 		};
 	}
 
@@ -47,6 +49,7 @@ export class RoutesPreview extends React.Component<Props, State> {
 						this.props.onNearToEnd?.();
 					}}
 					onEndReachedThreshold={0.1}
+					refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.props?.onRefresh?.()}></RefreshControl>}
 				></FlatList>
 			);
 		} else {
