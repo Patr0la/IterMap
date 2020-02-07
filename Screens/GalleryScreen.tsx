@@ -44,7 +44,7 @@ export class Gallery extends Component<Props, State> {
 		if (!this.state?.images) return null;
 
 		return (
-			<View style={{ flexDirection: "column", justifyContent: "space-evenly", width: "100%", height: "100%" }}>
+			<View style={{ flexDirection: "column", justifyContent: "space-evenly", width: "100%", height: "100%", backgroundColor: "white"}}>
 				<ScrollView style={{ flexDirection: "row", flexWrap: "wrap", backgroundColor: "white", width: "100%", height: "100%" }} contentContainerStyle={{ flex: 1, flexDirection: "row", justifyContent: "space-evenly", flexWrap: "wrap" }}>
 					{this.state.uploading && (
 						<View style={{ backgroundColor: "white", width: "100%", flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", height: d.height * 0.05 }}>
@@ -60,7 +60,7 @@ export class Gallery extends Component<Props, State> {
 							.map((photo, ci) => (
 								<TouchableOpacity
 									key={`${photo}`}
-									delayLongPress={250}
+									//delayLongPress={250}
 									onLongPress={() => {
 										console.log("LONG PRESS!");
 										this.setState({ selectingPictures: true, selectedPictures: [...(this.state.selectedPictures ?? []), `${photo}`] });
@@ -98,7 +98,7 @@ export class Gallery extends Component<Props, State> {
 				</ScrollView>
 
 				{this.state.selectingPictures ? (
-					<View style={{ width: d.width, backgroundColor: "white", flexDirection: "row", justifyContent: "space-evenly", height: 85, position: "absolute", top: d.height - 160, alignItems: "flex-start" }}>
+					<View style={{ width: d.width, backgroundColor: "white", flexDirection: "row", justifyContent: "space-evenly", height: 85, position: "absolute", top: d.height - 100, alignItems: "flex-start" }}>
 						{this.state.selectedPictures.length == 1 && (
 							<TouchableOpacity
 								style={{ flexDirection: "column", justifyContent: "center", alignItems: "center" }}

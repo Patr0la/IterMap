@@ -1,6 +1,6 @@
 import React from "react";
 import * as config from "../Config.json";
-import { View, Text, Dimensions, PanResponder, PanResponderInstance } from "react-native";
+import { View, Text, Dimensions, PanResponder, PanResponderInstance, StatusBar } from "react-native";
 import { AutoHeightImage } from "../Components/AutoHeightImage";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -25,6 +25,9 @@ export class PreviewRouteMarker extends React.Component<IProps, State> {
 
 	loadingId: string;
 	render() {
+		StatusBar.setTranslucent(false);
+		StatusBar.setBackgroundColor("#242424");
+
 		let data: State = this.props.navigation.getParam("data", {});
 
 		return (

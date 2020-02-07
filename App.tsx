@@ -29,6 +29,8 @@ import { RoutePreview } from "./Screens/RoutePreview";
 import { PreviewRouteMarker } from "./Screens/PreviewRouteMarker";
 import { ForgotPassword } from "./Screens/ForgotPassword";
 
+console.disableYellowBox = true;
+
 /*
     let uri = { uri: "https://www.rspcasa.org.au/wp-content/uploads/2019/01/Adopt-a-cat-or-kitten-from-RSPCA.jpg" };
     return <Stack/>;

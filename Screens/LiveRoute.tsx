@@ -62,6 +62,7 @@ export class LiveRoute extends React.Component<Props, State> {
 		let newPath = [];
 		let places = [];
 
+		if(!route.path) return {path: [], markers: []};
 		route.path.forEach((point) => processPoint(point, lastPoints, places, newPath));
 
 		console.log("Calculate root points");
@@ -141,10 +142,10 @@ export class LiveRoute extends React.Component<Props, State> {
 							title: "Route",
 							value: "route",
 						},
-						{
-							title: "Stats",
-							value: "stats",
-						},
+						// {
+						// 	title: "Stats",
+						// 	value: "stats",
+						// },
 						{
 							title: "Gallery",
 							value: "gallery",

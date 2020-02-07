@@ -78,7 +78,7 @@ export class Profile extends React.Component<IProps, State> {
 		let months = Math.floor(dt / 2629743);
 		let years = Math.floor(dt / 31556926);
 
-		let usedFor = years >= 1 ? `${years} years ${months} months` : months > 1 ? `${months} months` : `${weeks} weeks`;
+		let usedFor = years >= 1 ? `${years} years ${months} months` : months > 1 ? `${months} months` :  weeks > 0 ? `${weeks} weeks` : "less than a week";
 		return (
 			<View style={{ backgroundColor: "#242424", width: "100%", height: "100%" }}>
 				{/*<Search

@@ -71,9 +71,9 @@ export class SideMenu extends React.Component<IProps, IState> {
 					{/*
                     TODO better implementation of Cacgeable image
                 */}
-					<BetterImage parentViewStyle={styles.proifleImageParent} imageStyle={styles.profileImage} imageSource="web" url={`${config.host}/api/profilePic?u=${this.props.data}`} cacheImage data={this.props.data} navigation={this.props.navigation}>
-						<Icon name="account" size={128} color="#aaaa" />
-					</BetterImage>
+					{/*<BetterImage parentViewStyle={styles.proifleImageParent} imageStyle={styles.profileImage} imageSource="web" url={`${config.host}/api/profilePic?u=${this.props.data}`} cacheImage data={this.props.data} navigation={this.props.navigation}>
+			</BetterImage>*/}
+					<Icon name="account" size={128} color="#aaaa" style={styles.profileImage}/>
 
 					<Text style={{ alignSelf: "center", fontSize: 16, color: "white" }}>{this.props.data.username}</Text>
 
@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
 		width: 128,
 		height: 128,
 		borderRadius: 64,
+		alignSelf: "center"
 	},
 	touchableRow: {
 		backgroundColor: "#242424",

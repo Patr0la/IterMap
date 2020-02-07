@@ -1,5 +1,5 @@
 import React from "react";
-import { AsyncStorage, Button, Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
+import { AsyncStorage, Button, Dimensions, StyleSheet, Text, TextInput, View, Alert } from "react-native";
 import { CachableImage } from "../Components/CachableImage";
 import * as config from "../Config.json";
 import { AutoHeightImage } from "../Components/AutoHeightImage";
@@ -18,11 +18,16 @@ export class Login extends React.Component<Props, State> {
 		super(props);
 
 		this.login = this.login.bind(this);
+
+		this.state = {
+			username: "",
+			password: "",
+		};
 	}
 
 	login() {
 		if (!this.state.username || !this.state.password) {
-			alert("Input username and password."); // STYLE improve
+			Alert.alert("" , "Input username and password."); // STYLE improve
 			return;
 		}
 
@@ -66,8 +71,8 @@ export class Login extends React.Component<Props, State> {
 				<View style={styles.container}>
 					<Text style={{ fontSize: 22, color: "#242424", marginTop: "10%", height: d.height * 0.1 }}>Login or create account to continue.</Text>
 					<View style={{ width: "100%", padding: "5%", height: d.height * 0.2 }}>
-						<TextInput style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Username" placeholderTextColor="#242424" onChangeText={(username) => this.setState({ username })}></TextInput>
-						<TextInput style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Password" secureTextEntry placeholderTextColor="#242424" onChangeText={(password) => this.setState({ password })}></TextInput>
+						<TextInput style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Username" placeholderTextColor="#aaaaaa" onChangeText={(username) => this.setState({ username })}></TextInput>
+						<TextInput style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Password" secureTextEntry placeholderTextColor="#aaaaaa" onChangeText={(password) => this.setState({ password })}></TextInput>
 					</View>
 					<View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
 						<View style={{ flex: 10 }}></View>

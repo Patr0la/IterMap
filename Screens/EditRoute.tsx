@@ -192,7 +192,7 @@ export class EditRoute extends React.Component<Props, State> {
 			isPublic: this.state.isPublic,
 			cost: this.state.cost
 		};
-		fetch(`${config.host}/api/setMarkersForRoute`, {
+		fetch(`${config.host}/api/updateRoute`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
@@ -239,7 +239,7 @@ export class EditRoute extends React.Component<Props, State> {
 		}
 
 		return (
-			<View>
+			<View style={{backgroundColor: "white", flex: 1}}>
 				<PageNavigator
 					default="route"
 					routes={[

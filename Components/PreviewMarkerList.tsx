@@ -64,13 +64,15 @@ export class PreviewMarkerList extends React.Component<Props, State> {
 							keyboardShouldPersistTaps="always"
 							data={storedMarkers}
 							renderItem={({ item: { id, title, description, pictures, types } }) => {
+								let desc = description.substr(0, description.substr(0, 110).lastIndexOf(" "));
+								if (desc != "") desc = desc.concat(" ...");
 								return (
 									<TouchableOpacity
 										style={{ width: d.width * 0.8, height: d.height * 0.3, flexDirection: "row", alignItems: "center", padding: 10 }}
 										activeOpacity={1}
 										onPress={() => {
 											this.props.navigation.navigate("PreviewRouteMarkerScreen", {
-												data: { markerId: marker.id, routeId: this.props.routeId, pictures, title, description},
+												data: { markerId: marker.id, routeId: this.props.routeId, pictures, title, description },
 											});
 										}}
 									>
@@ -88,7 +90,7 @@ export class PreviewMarkerList extends React.Component<Props, State> {
 											)}
 											<View style={{ backgroundColor: "white", width: "100%", minHeight: d.height * 0.25, flexDirection: "column", flex: 1, marginRight: "5%", justifyContent: "space-evenly", padding: "4%" }}>
 												<Text style={{ color: "#242424", fontSize: 18, flex: 1, flexWrap: "wrap", width: "100%" }}>{title}</Text>
-												<Text style={{ color: "#242424", fontSize: 14, flex: 2, flexWrap: "wrap" }}>{description.substr(0, description.substr(0, 110).lastIndexOf(" ")).concat(" ...")}</Text>
+												<Text style={{ color: "#242424", fontSize: 14, flex: 2, flexWrap: "wrap" }}>{desc}</Text>
 											</View>
 										</View>
 									</TouchableOpacity>

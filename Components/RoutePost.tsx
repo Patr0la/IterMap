@@ -51,7 +51,6 @@ export class RoutePost extends React.Component<Props, State> {
 			<View
 				style={{ backgroundColor: "#323232" }}
 				onLayout={(e) => {
-					console.table(e.nativeEvent.layout);
 				}}
 			>
 				<View style={styles.header}>
@@ -96,7 +95,6 @@ export class RoutePost extends React.Component<Props, State> {
 						{this.state.creator == this.props.data.username && (
 							<TouchableOpacity
 								onLayout={(e) => {
-									console.table(e.nativeEvent.layout);
 								}}
 								onPress={() => this.props.navigation.navigate("EditRoute", { id: this.state._id })}
 								style={{ marginRight: 10 }}

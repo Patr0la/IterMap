@@ -1,5 +1,5 @@
 import React from "react";
-import { AsyncStorage, Button, Dimensions, Text, TextInput, View } from "react-native";
+import { AsyncStorage, Button, Dimensions, Text, TextInput, View, Alert } from "react-native";
 import { Switch } from "react-native-gesture-handler";
 import { CachableImage } from "../Components/CachableImage";
 import * as config from "../Config.json";
@@ -34,11 +34,12 @@ export class Register extends React.Component<Props, State> {
 	}
 
 	register() {
-		if (!this.state.username) return alert("Username is required.");
-		if (!this.state.password1) return alert("Password is required.");
-		if (!this.state.passwordsMatch) return alert("Passwords do not match.");
-		if (!this.state.email) return alert("Email is required.");
-		if (!this.state.licenseAccepted) return alert("You have to accept licence.");
+		if (!this.state.username) return Alert.alert("", "Username is required.");
+		if (!this.state.password1) return Alert.alert("", "Password is required.");
+		if (this.state.password1.length < 8 ) return Alert.alert("", "Should be at least 8 characters long.");
+		if (!this.state.passwordsMatch) return Alert.alert("", "Passwords do not match.");
+		if (!this.state.email) return Alert.alert("", "Email is required.");
+		if (!this.state.licenseAccepted) return Alert.alert("", "You have to accept licence.");
 
 		const password = sha.sha512(this.state.password1);
 
@@ -65,7 +66,7 @@ export class Register extends React.Component<Props, State> {
 
 						this.props.navigation.navigate("Home");
 					});
-				} 
+				}
 			})
 			.catch((err) => {
 				console.log(err);
@@ -74,17 +75,16 @@ export class Register extends React.Component<Props, State> {
 
 	render() {
 		return (
-			
 			<View style={{ height: d.height, flexDirection: "column", justifyContent: "space-between" }}>
 				{/*<Text style={{ color: "#242424", fontSize: 16 }}>Welcom to Iter, you new best sightseeing friend!</Text>*/}
 
-				<View style={{ backgroundColor: "white", alignItems: "center", justifyContent: "flex-start",flex:1, width: "100%"}}>
-					<Text style={{ fontSize: 22, color: "#242424", marginTop: "10%" }}>Login or create account to continue.</Text>
+				<View style={{ backgroundColor: "white", alignItems: "center", justifyContent: "flex-start", flex: 1, width: "100%" }}>
+					<Text style={{ fontSize: 22, color: "#242424", marginTop: "10%" }}>Create account.</Text>
 					<View style={{ width: "100%", padding: "5%" }}>
-						<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Username" placeholderTextColor="#242424" onChangeText={(username) => this.setState({ username })}></TextInput>
+						<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholder="Username" placeholderTextColor="#aaaaaa" onChangeText={(username) => this.setState({ username })}></TextInput>
 						<TextInput
 							style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }}
-							placeholderTextColor="#242424"
+							placeholderTextColor="#aaaaaa"
 							placeholder="Password"
 							onChangeText={(password1) => {
 								this.setState({ password1, passwordsMatch: password1 == this.state.password2 });
@@ -94,7 +94,7 @@ export class Register extends React.Component<Props, State> {
 						></TextInput>
 						<TextInput
 							style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }}
-							placeholderTextColor="#242424"
+							placeholderTextColor="#aaaaaa"
 							placeholder="Confirm Password"
 							onChangeText={(password2) => {
 								this.setState({ password2, passwordsMatch: this.state.password1 == password2 });
@@ -102,7 +102,7 @@ export class Register extends React.Component<Props, State> {
 							secureTextEntry
 							autoCapitalize="none"
 						></TextInput>
-						<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholderTextColor="#242424" placeholder="E-mail" onChangeText={(email) => this.setState({ email })}></TextInput>
+						<TextInput autoCapitalize="none" style={{ width: "100%", borderBottomColor: "#aaaaaa", borderBottomWidth: 2 }} placeholderTextColor="#aaaaaa" placeholder="E-mail" onChangeText={(email) => this.setState({ email })}></TextInput>
 						<View style={{ width: "100%", flexDirection: "row", justifyContent: "flex-start", alignItems: "center" }}>
 							<Text>I accept license aggreement:</Text>
 							<Switch style={{ margin: "5%" }} thumbColor="#242424" trackColor={{ false: "#aaaaaa", true: "#ad0a4c" }} onValueChange={(licenseAccepted) => this.setState({ licenseAccepted })} value={this.state.licenseAccepted}></Switch>
@@ -110,7 +110,7 @@ export class Register extends React.Component<Props, State> {
 					</View>
 					<View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%", alignContent: "center", alignItems: "center" }}>
 						<Button title="Create account" onPress={this.register} color="#ad0a4c"></Button>
-						<Text style={{ color: "#242424" }}></Text>
+						<Text style={{ color: "#aaaaaa" }}></Text>
 						<Button title="Back to login" onPress={() => this.props.navigation.navigate("Login")} color="#ad0a4c"></Button>
 					</View>
 				</View>
@@ -123,9 +123,9 @@ export class Register extends React.Component<Props, State> {
 					data={this.props.data}
 					imageProps={{
 						source: null,
-						style:{
-							marginBottom: d.height * 0.1
-						}
+						style: {
+							marginBottom: d.height * 0.1,
+						},
 					}}
 					width={d.width}
 					parent={this}
